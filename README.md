@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/12d5b00e-39e1-4210-a36a-4b8db8be12dc)
+
+
 Project Design
 The design of the GMAO application was driven by a structured UML analysis approach
 
