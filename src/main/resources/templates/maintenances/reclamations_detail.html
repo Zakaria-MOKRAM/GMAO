@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Maintenances </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Maintenances /</span>
+                Liste des anomalies
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${demarre} == 'ok'" class="alert alert-success" role="alert" id="demarre">
+                <p>La réclamation est commencée avec succés</p>
+              </div>
+              <div align="center" th:if="${traite} == 'ok'" class="alert alert-success" role="alert" id="traite">
+                <p>La réclamation est traitée avec succés</p>
+              </div>
+              <div align="center" th:if="${finished} == 'ok'" class="alert alert-success" role="alert" id="finished">
+                <p>L'intervention est terminée</p>
+              </div>
+              <div align="center" th:if="${started} == 'ok'" class="alert alert-success" role="alert" id="started">
+                <p>L'intervention est démarrée</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+
+              <!-- Basic Bootstrap Table -->
+              <div class="row"  th:if="${privilege} != null and ${privilege.privilege.id} > 1">
+                <div class="card mt-5" >
+                  <div class="card-header">
+                    <h4 style="font-weight: bold;text-align: center;color:dodgerblue">[[${reclamation.titre}]]</h4>
+                  </div>
+                  <div class="card-body" >
+                    <div class="row" >
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Créateur :</span>
+                          <span style="text-align: right" th:text="${reclamation.user.lastName+' '+reclamation.user.firstName}"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Date :</span>
+                          <span style="text-align: right" th:text="${#dates.format(reclamation.date, 'dd/MM/yyyy')}"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="row" >
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Urgent :</span>
+                          <span style="text-align: right" th:text="${reclamation.urgent} ? 'Oui' : 'Non'"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">statut :</span>
+                          <span style="text-align: right" th:switch="${reclamation.status.id}" >
+                                    <span th:case="1" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-info" th:text="${reclamation.status.libelle}"></span>
+                                    <span th:case="2" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-warning" th:text="${reclamation.status.libelle}"></span>
+                                    <span th:case="3" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-success" th:text="${reclamation.status.libelle}"></span>
+                                    <span th:case="4" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-danger" th:text="${reclamation.status.libelle}"></span>
+                                </span>
+                        </label>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="card mt-5" th:if="${reclamation.status.id} == 3">
+                  <div class="card-header">
+                    <h4 style="font-weight: bold;text-align: center;color:dodgerblue">Réponse</h4>
+                  </div>
+                  <div class="card-body" >
+                    <div class="row" >
+                      <div class="col-md-12">
+                        <label class="form-label">
+                          <textarea name="libelle" id="libelle"  class="form-control" readonly cols="120" rows="4">[[${reclamation.response}]]</textarea>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card mt-5" >
+                  <div class="card-header row">
+                    <div class="col-md-6" style="font-weight: bold;color:dodgerblue;font-size: 22px;text-align: left">
+                      <a class="btn btn-info btn-sm px-2 py-1 rounded-1 addModal" style="color: white !important;"
+                         th:data-id="${reclamation.id}"
+                         th:if="(${privilege} != null and ${privilege.privilege.id} > 1 ) and ${reclamation.status.id <=2}"
+                         title="Nouvlle piéce jointe"
+                         type="button ">
+                        <span class="bx bx-plus"> </span>
+                      </a>
+                      <i class="bx bx-file fa-lg fa-1x" style="margin-right: 4px"></i>PIÉCES JOINTES</h4>
+                    </div>
+                    <div class="col-md-6" style="font-weight: bold;color:dodgerblue;font-size: 22px;text-align: right">
+
+                    </div>
+                  </div>
+                  <div class="card-body" >
+                    <div class="alert alert-info" th:if="${pjs.size() == 0}">
+                      <strong style="color: red">INFO:</strong>
+                      <span th:text="'Aucune piéce jointe enregistrée pour le moment.'" style="color: white; align: center"></span>
+                    </div>
+                    <div class="table-responsive" th:if="${pjs.size() != 0}">
+                      <table class="table table-hover table-sm" id="myDataTable">
+                        <thead class="bg-light">
+                        <tr>
+                          <th>Libelle</th>
+                          <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="list">
+                        <tr th:each="c :${pjs}">
+                          <td>
+                            <a target="_blank" class="dontprint" th:href="'../reclamations_showPJ?id='+${reclamation.id}+'&pj_id='+${c.id}">
+                              <span th:text="${c.nom_pj}"></span>
+                            </a>
+                          </td>
+                          <td class="text-center">
+                            <a class="btn btn-danger btn-sm px-2 py-1 deletePJModal" style="color: white !important;"
+                               th:data-id="${c.id}"
+                               th:if="(${privilege} != null and ${privilege.privilege.id} > 3 ) and ${reclamation.status.id ==1}"
+                               title="Supprimer" type="button ">
+                              <span class="bx bx-trash "></span>
+                            </a>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <!--/ Basic Bootstrap Table -->
+
+
+
+              <div aria-hidden="true" class="modal fade" id="addModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Ajout : Piéce jointe</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/reclamations_addPJ}" enctype="multipart/form-data">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <div class="mb-1 small">Choisir le(s) fichier(s)</div>
+                            <input type="file" id="inputFile" name="file" style="max-width:100%"/>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div aria-hidden="true" class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title text-white">Suppression : Réclamation</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="bx bx-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/reclamation/deleteReclamation}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment supprimer cette réclamation ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" class="modal fade" id="deletePJModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Suppression : PJ</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="bx bx-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/reclamations_deletePJ}" enctype="multipart/form-data">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment supprimer cette pj ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" class="modal fade" id="demarrerModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Démarrage : Réclamation</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="bx bx-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/reclamation/demarrerReclamation}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment démarrer cette réclamation ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                            <input name="action" type="hidden" value="detail">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" class="modal fade" id="traiterModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Terminaison : Réclamation</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="bx bx-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/reclamation/traiterReclamation}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <input name="action" type="hidden" value="detail">
+                          <div class="col-md-12">
+                            <label class="form-label">Reponse</label>
+                            <div class="input-group input-group-merge">
+                              <textarea name="response" id="response" style="resize: vertical;" class="form-control"></textarea>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment traiter cette réclamation ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script th:inline="javascript">
+
+
+      $(document).on("click", ".addModal", function () {
+        var id = $(this).data('id');
+        $("#addModal .modal-body #id").val(id);
+        $("#addModal").modal('show');
+      });
+      $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $("#deleteModal .modal-body #id").val(id);
+        $("#deleteModal").modal('show');
+      });
+      $(document).on("click", ".deletePJModal", function () {
+        var id = $(this).data('id');
+        $("#deletePJModal .modal-body #id").val(id);
+        $("#deletePJModal").modal('show');
+      });
+      $(document).on("click", ".demarrerModal", function () {
+        var id = $(this).data('id');
+        $("#demarrerModal .modal-body #id").val(id);
+        $("#demarrerModal").modal('show');
+      });
+      $(document).on("click", ".traiterModal", function () {
+        var id = $(this).data('id');
+        $("#traiterModal .modal-body #id").val(id);
+        $("#traiterModal").modal('show');
+      });
+
+
+
+      /*]]>*/
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+      });
+    </script>
+
+    <script th:inline="javascript">
+      setTimeout(function() {
+
+        $("#added").hide(600);
+        $("#traite").hide(600);
+        $("#demarre").hide(600);
+        $("#finished").hide(600);
+        $("#started").hide(600);
+        $("#deleted").hide(600);
+        $("#updated").hide(600);
+      }, 3000);
+
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Equipements </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+  <style>
+    .dt-length, .dt-info{
+      margin-left: 1rem;
+    }
+    .dt-input {
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Equipements /</span>
+                <span class="text-muted fw-light">Fournisseurs d'articles /</span>
+                [[${fournisseur.rs}]]
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${changed} == 'ok'" class="alert alert-success" role="alert" id="changed">
+                <p>Le changement a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+               <div align="center" th:if="${updatedPass} == 'ok'" class="alert alert-success" role="alert" id="updatedPass">
+                <p>Le mot de passe a été a bien changé</p>
+              </div>
+              <!-- Basic Bootstrap Table -->
+              <div class="card">
+
+                <div class="card-body">
+                  <div class="mb-9">
+                    <div class="row align-items-center justify-content-between g-3 mb-4">
+                      <div class="col-auto">
+                        <h2 class="mb-0">Détails fournisseur</h2>
+                      </div>
+                      <div class="" style="margin: 2%">
+                        <a class="btn btn-sm btn-primary p-2" th:href="@{/equipements/fournisseurs_add}"
+                           style="margin-right:5px;float: right" th:if="${privilege} != null and ${privilege.privilege.id} > 3"
+                           title="Ajouter un fournisseur"
+                           type="button">
+                          <i class="bx bx-plus"></i>
+                        </a>
+                        <a class="btn btn-sm btn-danger p-2 deleteModal"
+                           th:data-id="${fournisseur.id}"
+                           style="margin-right:2px;float: right"  th:if="(${privilege} != null and ${privilege.privilege.id} > 3 ) and ${fournisseur.canDelete}"
+                           title="Supprimer" type="button ">
+                          <i class="bx bx-trash"></i>
+                        </a>
+                        <a class="btn btn-sm btn-success p-2" th:href="@{/equipements/fournisseurs_edit}+'/'+${fournisseur.id}"
+                           style="margin-right:2px;float: right" th:if="${privilege} != null and ${privilege.privilege.id} > 2"
+                           title="Modifier un fournisseur"
+                           type="button">
+                          <i class="bx bx-edit"></i>
+                        </a>
+
+                      </div>
+                    </div>
+                    <div class="row g-5">
+                      <div class="col-12">
+                        <div class="row g-3 g-xxl-0 h-100">
+                          <div class="col-md-7">
+                            <div class="card h-100">
+                              <div class="card-body d-flex flex-column justify-content-between pb-3">
+                                <div class="row align-items-center g-5 mb-3 text-center text-sm-start">
+                                  <div class="col-12 col-sm-auto mb-sm-2">
+                                    <div class="avatar avatar-5xl"><img class="rounded-circle" th:src="@{/assets/img/avatars/0.png}" alt="" /></div>
+                                  </div>
+                                  <div class="col-12 col-sm-auto flex-1">
+                                    <h3 th:text="${fournisseur.rs}"></h3>
+                                  </div>
+                                  <div class="col-12 col-sm-auto flex-1">
+                                    <h5 class="text-800">Activité </h5>
+                                    <p class="text-800" th:text="${fournisseur.activite} != null ? ${fournisseur.activite.label} : '-'"></p>
+                                    <h5 class="text-800">Catégories </h5>
+                                    <p class="text-800" th:each="cat : ${fournisseur.categories}">
+                                      <span th:text="${cat.libelle}"></span><br/>
+                                    </p>
+                                  </div>
+                                </div>
+                                <div class="d-flex flex-between-center border-top border-dashed border-300 pt-4">
+                                  <div>
+                                    <h6>Bon de réceptions</h6>
+                                    <p class="fs-1 text-800 mb-0" th:text="${receptions.size()}"></p>
+                                  </div>
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-5">
+                            <div class="card h-100">
+                              <div class="card-body pb-3">
+                                <div class="d-flex align-items-center mb-3">
+                                  <h3 class="me-1">Informations générales</h3>
+                                  <a class="btn btn-link p-0" th:if="(${privilege} != null and ${privilege.privilege.id} > 2 )" target="_blank"
+                                     title="Consulter detail" th:href="'./../editFournisseur/'+${fournisseur.id}">
+                                    <span class="fas fa-pen fs-0 ms-3 text-500"></span>
+                                  </a>
+                                </div>
+                                <h5 class="text-800">Adresse</h5>
+                                <p class="text-800">
+                                  <span th:text="${fournisseur.address != null} and ${fournisseur.address != ''} ? ${fournisseur.address} : '-'"></span><br />
+                                  <span th:if="${fournisseur.ziptown != ''}" th:text="${fournisseur.ziptown}+''"></span>
+                                  <span th:if="${fournisseur.province != null}" th:text="${fournisseur.province.nom}+','"></span>
+                                  <span th:if="${fournisseur.town != ''}" th:text="${fournisseur.town}"></span><br />
+                                  <span th:if="${fournisseur.pays != null}" th:text="${fournisseur.pays.label}"></span>
+                                </p>
+                                <div class="row">
+                                  <div class="col-md-6">
+                                    <h5 class="text-800">Email</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.email} != null and ${fournisseur.email} != '') ? ${fournisseur.email} :'_'"></span></p>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <h5 class="text-800">Phone</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.phone} != null and ${fournisseur.phone} != '') ? ${fournisseur.phone} :'_'"></span>  </p>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-6">
+                                    <h5 class="text-800">Fax</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.fax} != null and ${fournisseur.fax} != '') ? ${fournisseur.fax} :'_'"></span>  </p>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <h5 class="text-800">Site web</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.url} != null and ${fournisseur.url} != '') ? ${fournisseur.url} : '_'"></span>  </p>
+                                  </div>
+                                </div>
+
+
+
+                                <p onclick="getMoreInfos()" style="text-align: right">
+                                  <button class="btn btn-primary" id="btn_more">Plus d'informations</button>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12 more_info" style="display: none">
+                        <div class="row g-3 g-xxl-0 h-100">
+                          <div class="col-12 col-md-12 col-xxl-12 mb-xxl-12">
+                            <div class="card h-100">
+                              <div class="card-body pb-3 ">
+                                <div class="d-flex align-items-center mb-3">
+                                  <h3 class="me-1">Autre informations</h3>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-2">
+                                    <h5 class="text-800">R.C</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.siren} != null and ${fournisseur.siren} != '') ? ${fournisseur.siren} : '_'"></span></p>
+                                  </div>
+                                  <div class="col-md-2">
+                                    <h5 class="text-800">Patente</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.siret} != null and ${fournisseur.siret} != '') ? ${fournisseur.siret} : '_'"></span></p>
+                                  </div>
+                                  <div class="col-md-2">
+                                    <h5 class="text-800">I.F</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.ape} != null and ${fournisseur.ape} != '') ? ${fournisseur.ape} : '_'"></span></p>
+                                  </div>
+                                  <div class="col-md-2">
+                                    <h5 class="text-800">C.N.S.S</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.idprof4} != null and ${fournisseur.idprof4} != '') ? ${fournisseur.idprof4} : '_'"></span></p>
+                                  </div>
+                                  <div class="col-md-2">
+                                    <h5 class="text-800">I.C.E</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.idprof5} != null and ${fournisseur.idprof5} != '') ? ${fournisseur.idprof5} : '_'"></span></p>
+                                  </div>
+                                  <div class="col-md-2">
+                                    <h5 class="text-800">Forme juridique</h5>
+                                    <p class="text-800"><span th:text="(${fournisseur.forme} != null and ${fournisseur.forme} != '' and ${fournisseur.forme.libelle} != null and ${fournisseur.forme.libelle} != '') ? ${fournisseur.forme?.libelle} : '_'"></span></p>
+                                  </div>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <div class="mb-6">
+                          <h3 class="mb-4">Bons de réception <span class="text-700 fw-normal" th:text="'('+${receptions.size()+')'}"></span></h3>
+                          <div class="mb-6" style="margin: 2%">
+                            <a class="btn btn-sm btn-primary p-2" th:href="@{/equipements/brs_add}"
+                               style="margin-right:5px;float: right" th:if="${privilegeBR} != null and ${privilegeBR.privilege.id} > 3"
+                               title="Ajouter un BR"
+                               type="button">
+                              <i class="bx bx-plus"></i>
+                            </a>
+                          </div>
+                          <div class="border-top border-bottom border-200" id="customerOrdersTable" data-list='{"valueNames":["date","ref","entrepot","fulfilment_status","total_ttc"],"page":3,"pagination":true}'>
+                            <div class="table-responsive scrollbar">
+                              <table id="myDataTable" class="table table-sm fs--1 mb-0">
+                                <thead>
+                                <tr>
+                                  <th class="sort white-space-nowrap align-middle ps-0 pe-3" scope="col" data-sort="date" style="width:10%;">Date</th>
+                                  <th class="sort align-middle pe-7" scope="col" data-sort="ref" style="width:20%;">Ref.</th>
+                                  <th class="sort align-middle white-space-nowrap pe-3" scope="col" data-sort="entrepot" style="width:15%;">Entrepot</th>
+                                  <th class="sort align-middle white-space-nowrap text-start pe-3" scope="col" data-sort="fulfilment_status" style="width:20%;"> Statut</th>
+                                  <th class="sort align-middle white-space-nowrap" scope="col" data-sort="total_ttc" style="width:30%;text-align: right">Total TTC</th>
+                                  <th class="sort align-middle pe-0 ps-5" scope="col">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody class="list" id="customer-order-table-body">
+                                <tr class="hover-actions-trigger btn-reveal-trigger position-static" th:each="c :${receptions}">
+                                  <td style="" th:text="${#dates.format(c.date, 'dd/MM/yyyy')}"></td>
+                                  <td th:text="${c.code}"></td>
+                                  <td th:text="${c.entrepot.libelle}"></td>
+                                  <td th:switch="${c.status.id}" style="white-space: nowrap;">
+                                    <span th:case="1" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-info" th:text="${c.status.libelle}"></span>
+                                    <span th:case="2" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-success" th:text="${c.status.libelle}"></span>
+                                    <span th:case="3" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-danger" th:text="${c.status.libelle}"></span>
+                                  </td>
+                                  <td style="text-align: right;" th:text="${#numbers.formatDecimal(c.total_ttc,1,'DEFAULT',2,'DEFAULT')}"></td>
+                                  <td class="align-middle white-space-nowrap pe-0 ps-5">
+                                    <div class="font-sans-serif btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs--2" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h fs--2"></span></button>
+                                      <div class="dropdown-menu dropdown-menu-end py-2">
+                                        <a target="_blank" class="dropdown-item" th:href="'./../../../stock/br/detail/'+${c.id}">Consulter le détail</a>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                </tbody>
+                              </table>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <h1 class="card-footer"></h1>
+
+              </div>
+              <!--/ Basic Bootstrap Table -->
+
+
+              <div aria-hidden="true" class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title text-white">Suppression : Fournisseurs</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/equipements/fournisseurs_delete}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment supprimer ce fournisseur ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script th:inline="javascript">
+
+
+      function getMoreInfos(){
+        var more=$(".more_info");
+        var btn_more=$("#btn_more");
+        console.log(btn_more[0].innerHTML)
+        if(btn_more[0].innerHTML == "Plus d'informations"){
+          btn_more[0].innerHTML="Moins d'informations";
+        }else{
+          btn_more[0].innerHTML="Plus d'informations";
+
+        }
+        more.toggle();
+
+      }
+      $(document).on("click", ".editModal", function () {
+        var id = $(this).data('id');
+        var libelle = $(this).data('libelle');
+        $("#editModal .modal-body #id").val(id);
+        $("#editModal .modal-body #libelle").val(libelle);
+        $("#editModal").modal('show');
+      });
+
+      $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $("#deleteModal .modal-body #id").val(id);
+        $("#deleteModal").modal('show');
+      });
+
+      $(document).on("click", ".changeModal", function () {
+        var id = $(this).data('id');
+        var type = $(this).data('type');
+        if(type == 'Mobile'){
+          var emplacement_id=$(this).data('emplacement_id');
+          $("#changeModal .modal-body #change_emplacement").show();
+          $("#changeModal .modal-body #change_installation").hide();
+          $("#changeModal .modal-body #old_emplacement").val(emplacement_id);
+          $("#changeModal .modal-body #emplacement_id").val(emplacement_id);
+          $("#changeModal .modal-body #emplacement_id").attr("required",true);
+          $("#changeModal .modal-body #change_installation").attr("required",false);
+
+        }else{
+          var installation_id=$(this).data('installation_id');
+          $("#changeModal .modal-body #change_emplacement").hide();
+          $("#changeModal .modal-body #change_installation").show();
+          $("#changeModal .modal-body #old_installation").val(installation_id);
+          $("#changeModal .modal-body #installation_id").val(installation_id);
+          $("#changeModal .modal-body #installation_id").attr("required",true);
+          $("#changeModal .modal-body #emplacement_id").attr("required",false);
+
+        }
+
+        $("#changeModal .modal-footer #validerBtn").attr("disabled",true);
+
+        $("#changeModal .modal-body #id").val(id);
+        $("#changeModal").modal('show');
+      });
+
+      /*]]>*/
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+      });
+    </script>
+
+    <script th:inline="javascript">
+      setTimeout(function() {
+        $("#added").hide(600);
+        $("#deleted").hide(600);
+        $("#updated").hide(600);
+        $("#changed").hide(600);
+        $("#updatedPass").hide(600);
+      }, 3000);
+
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function valider_username(username,modal) {
+        var id = "#"+modal+" .modal-body #username"
+        var val = "#"+modal+" .modal-body #msg_cin_val"
+        var usernames = [[${usernames}]];
+
+        if( $.inArray(username, usernames) != -1){
+
+          $(val).show();
+          $(id).val("");
+          setTimeout(function() {
+            $(val).hide(600);
+          }, 3000);
+        }
+      }
+      function changeEmplacement(modal) {
+        var id = $("#"+modal+" .modal-body #emplacement_id").val();
+        var old_emplacement = $("#"+modal+" .modal-body #old_emplacement").val();
+
+        console.log("id : "+id)
+        console.log("old_emplacement : "+old_emplacement)
+        if(old_emplacement == id){
+          $("#changeModal .modal-footer #validerBtn").attr("disabled",true);
+        }else{
+          $("#changeModal .modal-footer #validerBtn").attr("disabled",false);
+        }
+      }
+      function changeInstallation(modal) {
+        var id = $("#"+modal+" .modal-body #installation_id").val();
+        var old_installation = $("#"+modal+" .modal-body #old_installation").val();
+        if(old_installation == id){
+          $("#changeModal .modal-footer #validerBtn").attr("disabled",true);
+        }else{
+          $("#changeModal .modal-footer #validerBtn").attr("disabled",false);
+        }
+      }
+
+
+
+      function change_emplacement(tache,modal) {
+        var div_emplacement = ".div_emplacement";
+        var code_emplacement = "#code_emplacement";
+        var libelle_emplacement = "#libelle_emplacement";
+
+        if(tache != null && tache == "new" ){
+          $(div_emplacement).show();
+          $(code_emplacement).attr("required",true);
+          $(libelle_emplacement).attr("required",true);
+        }else{
+          $(div_emplacement).hide();
+          $(code_emplacement).removeAttr("required");
+          $(libelle_emplacement).removeAttr("required");
+        }
+
+      }
+
+      $(document).ready(function() {
+        $('#myDataTable').DataTable({
+          "language": {
+            "emptyTable": "Aucun résultat",
+            "search": "",
+            "searchPlaceholder": "Recherche ...",
+            "show": "Length:",
+            "zeroRecords": "Pas de résultats",
+            "info": "Afficher _START_ à _END_ de _TOTAL_",
+            "infoEmpty": "Afficher 0 à 0 de 0",
+            "lengthMenu": "_MENU_ Lignes sont affichées",
+          },
+          order: [],
+        });
+      });
+      /*]]>*/
+    </script>
+
+  </body>
+</html>

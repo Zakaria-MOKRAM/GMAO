@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Equipements </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+  <style>
+    .dt-length, .dt-info{
+      margin-left: 1rem;
+    }
+    .dt-input {
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Equipements /</span>
+                <span class="text-muted fw-light">Liste des articles d'un équipement /</span>
+                [[${equipement.libelle}]]
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+               <div align="center" th:if="${updatedPass} == 'ok'" class="alert alert-success" role="alert" id="updatedPass">
+                <p>Le mot de passe a été a bien changé</p>
+              </div>
+              <!-- Basic Bootstrap Table -->
+              <div class="card">
+                <h4 class="card-header" style="font-weight: bold;text-align: center;color:#696cff">Liste des articles</h4>
+                <div class="table-responsive text-nowrap">
+                  <div style="margin: 2%">
+                    <button class="btn btn-sm btn-primary p-2 addModal" style="float: right;color: white !important;"
+                            th:data-id="${equipement.id}"
+                            th:if="${privilege} != null and ${privilege.privilege.id} > 3"
+                            title="Ajouter un article"
+                            type="button">
+                      <i class="bx bx-plus"></i>
+                    </button>
+                  </div>
+
+
+                  <table id="myDataTable" class="table">
+                    <thead>
+                    <tr>
+                      <th >Article code</th>
+                      <th >Article Nom</th>
+                      <th >Type Compteur</th>
+                      <th >Valeur Compteur</th>
+                      <th class="text-center  ">
+                        Actions
+                      </th>
+                    </tr>
+                    </thead>
+                    <tbody class="list">
+                    <tr th:each="c :${equipement_articles}">
+                      <td th:text="${c.article} !=null ? ${c.article.code} : '-'"></td>
+                      <td th:text="${c.article} !=null ? ${c.article.libelle} : '-'"></td>
+                      <td th:text="${c.article.has_compteur} !=null ? ${c.article.has_compteur} : '-'"></td>
+                      <td th:text="${c.article.type_compteur} !=null ? ${c.article.type_compteur} : '-'"></td>
+                      <td class="text-center">
+                        <div id="actions_div" th:if="${privilege} != null and ${privilege.privilege.id} > 2">
+                          <a class="btn btn-danger btn-sm px-2 py-1 deleteModal" style="color: white !important;"
+                             th:data-id="${c.id}"
+                             th:if="(${privilege} != null and ${privilege.privilege.id} > 3) and ${c.canDelete}"
+                             title="Supprimer" type="button ">
+                            <i class="bx bx-trash"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <h1 class="card-footer"></h1>
+
+              </div>
+              <!--/ Basic Bootstrap Table -->
+
+
+              <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Affecter un nouveau article</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="post" th:action="@{/equipements/equipements_articles/addArticle}">
+                      <div class="modal-body">
+                        <input id="id" name="id" type="hidden">
+                        <div class="row g-2">
+                        <div class="col mb-0">
+                          <label class="form-label">Article <span style="color: red">*</span></label>
+                          <select class="form-select" name="article_id" required  onchange="change_article(this.value,'addModal')" id="article_id">
+                            <option value="">Choisir un article</option>
+                            <option th:each="v : ${articles}" th:value="${v.id}">
+                              <span th:text="@{${v.libelle}}"></span>
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                        <div class="row div_article" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Code Article </label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" type="text" th:placeholder="'Code article'" th:name="'article_code'" id="article_code" />
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Libellé Article </label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" type="text" th:placeholder="'Libellé article'" th:name="'article_libelle'" id="article_libelle" />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row div_article" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Avec compteur? <span style="color: red">*</span></label>
+                            <div class="form-check  mt-3">
+                              <input class="form-check-input" type="radio" name="has_compteur" id="inlineRadio1" value="Compteur durée" onchange="change_compteur(this.value,'addModal')"/>
+                              <label class="form-check-label" for="inlineRadio1">Compteur durée</label>
+                            </div>
+                            <div class="form-check ">
+                              <input class="form-check-input" type="radio" name="has_compteur" id="inlineRadio2" value="compteur équipement"  onchange="change_compteur(this.value,'addModal')"/>
+                              <label class="form-check-label" for="inlineRadio2">Compteur d'équipement</label>
+                            </div>
+                            <div class="form-check ">
+                              <input class="form-check-input" type="radio" name="has_compteur" id="inlineRadio3" value="hybride"  onchange="change_compteur(this.value,'addModal')"/>
+                              <label class="form-check-label" for="inlineRadio3">Hybride (Les deux)</label>
+                            </div>
+                            <div class="form-check ">
+                              <input class="form-check-input" type="radio" name="has_compteur" id="inlineRadio4" value="sans compteur" checked onchange="change_compteur(this.value,'addModal')"/>
+                              <label class="form-check-label" for="inlineRadio4">Sans compteur</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6 div_compteur" style="display: none">
+                            <label class="form-label">Valeur compteur initiale <span style="color: red">*</span></label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="valeur_compteur" name="valeur_compteur" type="number" min="0">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row div_article" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Unité</label>
+                            <div class="input-group input-group-merge">
+                              <select class="form-select" name="article_unite" id="article_unite" onchange="change_unite(this.value,'addModal')">
+                                <option value="">Choisir une unité</option>
+                                <option style="font-weight: bold" value="new">--NOUVELLE unité--</option>
+                                <th:block th:each="a : ${unites}">
+                                  <option th:value="${a.id}" th:text="${a.code+' - '+a.libelle}"></option>
+                                </th:block>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Prix par défault de l'article </label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" type="number" step="0.01" min="0" placeholder="Prix par défault" id="article_pmp" name="article_pmp" />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row div_unite" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Unité Code</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" type="text" th:placeholder="'exemple : kg'" th:name="'unite_code'" id="unite_code" />
+
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Unité Libellé</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" type="text" th:placeholder="'exemple : kilogramme'" th:name="'unite_libelle'" id="unite_libelle" />
+
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                      <button type="submit" class="btn btn-primary">Valider</button>
+                    </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Suppression</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="post" th:action="@{/equipements/equipements_articles/deleteArticle}">
+                      <div class="modal-body">
+                        <input id="id" name="id" type="hidden">
+                      Voulez-vous vraiment supprimer cet artile ?
+                    </div>
+                      <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                      <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script th:inline="javascript">
+
+      $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $("#deleteModal .modal-body #id").val(id);
+        $("#deleteModal").modal('show');
+      });
+
+      $(document).on("click", ".addModal", function () {
+
+        var id = $(this).data('id');
+        $("#addModal .modal-body #id").val(id);
+        $("#addModal").modal('show');
+      });
+      /*]]>*/
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+      });
+    </script>
+
+    <script th:inline="javascript">
+      setTimeout(function() {
+        $("#added").hide(600);
+        $("#deleted").hide(600);
+        $("#updated").hide(600);
+        $("#updatedPass").hide(600);
+      }, 3000);
+
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function valider_username(username,modal) {
+        var id = "#"+modal+" .modal-body #username"
+        var val = "#"+modal+" .modal-body #msg_cin_val"
+        var usernames = [[${usernames}]];
+
+        if( $.inArray(username, usernames) != -1){
+
+          $(val).show();
+          $(id).val("");
+          setTimeout(function() {
+            $(val).hide(600);
+          }, 3000);
+        }
+      }
+      /*]]>*/
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function change_article(article,modal) {
+        var div_article = ".div_article";
+        var article_code = "#article_code";
+        var article_libelle = "#article_libelle";
+        var article_pmp = "#article_pmp";
+        var article_unite = "#article_unite";
+        if(article != null && article == "new" ){
+          $(div_article).show();
+          $(article_code).attr("required",true);
+          $(article_libelle).attr("required",true);
+          $(article_pmp).attr("required",true);
+          $(article_unite).attr("required",true);
+        }else{
+          $(div_article).hide();
+          $(article_code).removeAttr("required");
+          $(article_libelle).removeAttr("required");
+          $(article_pmp).removeAttr("required");
+          $(article_unite).removeAttr("required");
+        }
+
+      }
+
+      function change_unite(article,modal) {
+        var div_unite = ".div_unite";
+        var unite_libelle = "#unite_libelle";
+        var unite_code = "#unite_code";
+        if(article != null && article == "new" ){
+          $(div_unite).show();
+          $(unite_libelle).attr("required",true);
+          $(unite_code).attr("required",true);
+        }else{
+          $(div_unite).hide();
+          $(unite_libelle).removeAttr("required");
+          $(unite_code).removeAttr("required");
+        }
+
+      }
+
+      function change_compteur(tache,modal) {
+        var div_compteur = ".div_compteur";
+        var has_compteur =document.querySelector('input[name="has_compteur"]:checked').value;
+
+        if(has_compteur != null && (has_compteur == "Compteur durée" || has_compteur == "hybride" ) ){
+          $(div_compteur).show();
+          $("#valeur_compteur").attr("required",true);
+        }else{
+          $(div_compteur).hide();
+          $("#valeur_compteur").removeAttr("required");
+        }
+
+      }
+
+      $(document).ready(function() {
+        $('#myDataTable').DataTable({
+          "language": {
+            "emptyTable": "Aucun résultat",
+            "search": "",
+            "searchPlaceholder": "Recherche ...",
+            "show": "Length:",
+            "zeroRecords": "Pas de résultats",
+            "info": "Afficher _START_ à _END_ de _TOTAL_",
+            "infoEmpty": "Afficher 0 à 0 de 0",
+            "lengthMenu": "_MENU_ Lignes sont affichées",
+          },
+          order: [],
+        });
+      });
+      /*]]>*/
+    </script>
+
+
+  </body>
+</html>

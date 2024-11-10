@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+  <title>Fullcalendar - Apps | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+
+
+  <meta name="description" content="Most Powerful &amp; Comprehensive Bootstrap 5 HTML Admin Dashboard Template built for developers!" />
+  <meta name="keywords" content="dashboard, bootstrap 5 dashboard, bootstrap 5 design, bootstrap 5">
+  <!-- Canonical SEO -->
+  <link rel="canonical" href="https://themeselection.com/item/sneat-bootstrap-html-admin-template/">
+
+
+  <!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5DDHKGP');</script>
+  <!-- End Google Tag Manager -->
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="../../assets/img/favicon/favicon.ico" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/fontawesome.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/flag-icons.css}" />
+
+
+  <!-- Core CSS -->
+
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+
+
+  <!-- Vendors CSS -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/typeahead-js/typeahead.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/fullcalendar/fullcalendar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/flatpickr/flatpickr.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/select2/select2.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/quill/editor.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/@form-validation/umd/styles/index.min.css}" />
+
+  <!-- Page CSS -->
+
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/pages/app-calendar.css}" />
+
+  <!-- Helpers -->
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/vendor/js/template-customizer.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+
+</head>
+
+<body>
+
+
+<!-- ?PROD Only: Google Tag Manager (noscript) (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5DDHKGP" height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- Layout wrapper -->
+<div class="layout-wrapper layout-content-navbar  ">
+  <div class="layout-container">
+    <!-- Menu -->
+    <style th:replace="/shared/sidebar"></style>
+    <!-- / Menu -->
+    <!-- Layout container -->
+    <div class="layout-page">
+
+      <!-- Navbar -->
+      <style th:replace="/shared/navbar"></style>
+      <!-- / Navbar -->
+
+
+
+      <!-- Content wrapper -->
+      <div class="content-wrapper">
+
+        <!-- Content -->
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+
+
+          <div class="card app-calendar-wrapper">
+            <div class="row g-0">
+              <!-- Calendar Sidebar -->
+              <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
+                <div class="border-bottom p-4 my-sm-0 mb-3">
+                  <div class="d-grid">
+                    <a  th:href="@{/maintenances/interventions_add}" class="btn btn-primary btn-toggle-sidebar" target="_blank">
+                      <i class="bx bx-plus me-1"></i>
+                      <span class="align-middle">Nouvelle intervention</span>
+                    </a>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <!-- inline calendar (flatpicker) -->
+                  <div class="ms-n2">
+                    <div class="inline-calendar"></div>
+                  </div>
+
+                  <hr class="container-m-nx my-4">
+
+                  <!-- Filter -->
+                  <div class="mb-4">
+                    <small class="text-small text-muted text-uppercase align-middle">Filter</small>
+                  </div>
+
+                  <div class="form-check mb-2">
+                    <input class="form-check-input select-all" type="checkbox" id="selectAll" data-value="all" checked>
+                    <label class="form-check-label" for="selectAll">View All</label>
+                  </div>
+
+                  <div class="app-calendar-events-filter">
+                    <div class="form-check form-check-danger mb-2">
+                      <input class="form-check-input input-filter" type="checkbox" id="select-annule" data-value="annule" checked>
+                      <label class="form-check-label" for="select-annule">Annulé</label>
+                    </div>
+                    <div class="form-check form-check-warning mb-2">
+                      <input class="form-check-input input-filter" type="checkbox" id="select-en_cours" data-value="en_cours" checked>
+                      <label class="form-check-label" for="select-en_cours">En cours</label>
+                    </div>
+                    <div class="form-check form-check-success mb-2">
+                      <input class="form-check-input input-filter" type="checkbox" id="select-termine" data-value="termine" checked>
+                      <label class="form-check-label" for="select-termine">Terminé</label>
+                    </div>
+                    <div class="form-check form-check-info">
+                      <input class="form-check-input input-filter" type="checkbox" id="select-nouveau" data-value="nouveau" checked>
+                      <label class="form-check-label" for="select-nouveau">Nouveau</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- /Calendar Sidebar -->
+
+              <!-- Calendar & Modal -->
+              <div class="col app-calendar-content">
+                <div class="card shadow-none border-0">
+                  <div class="card-body pb-0">
+                    <!-- FullCalendar -->
+                    <div id="calendar"></div>
+                  </div>
+                </div>
+                <div class="app-overlay"></div>
+                <!-- FullCalendar Offcanvas -->
+                <div class="offcanvas offcanvas-end event-sidebar" tabindex="-1" id="addEventSidebar" aria-labelledby="addEventSidebarLabel">
+                  <div class="offcanvas-header border-bottom" style="background-color: #696cff;color: white">
+                    <h5 class="offcanvas-title mb-2" id="addEventSidebarLabel" style="color: white !important;">Consulter détail</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                  </div>
+                  <div class="offcanvas-body">
+                    <form class="event-form pt-0" id="eventForm" onsubmit="return false">
+                      <div class="mb-3">
+                        <label class="form-label" for="eventTitle">Titre</label>
+                        <input type="text" class="form-control" id="eventTitle" name="eventTitle" placeholder="Event Title" />
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label" for="eventStartDate">Date début</label>
+                        <input type="text" class="form-control" id="eventStartDate" name="eventStartDate" placeholder="Start Date" />
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label" for="eventLabel">Statut d'intervention</label>
+                        <select class="select2 select-event-label form-select" id="eventLabel" name="eventLabel">
+                          <option th:data-label="${s.color}" th:each="s : ${status}" th:value="${s.code}">[[${s.libelle}]]</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label" for="eventLabel">Type d'intervention</label>
+                        <select class="select2 select-event-type form-select" id="eventType" name="eventType">
+                          <option th:each="s : ${types}" th:value="${s.id}">[[${s.libelle}]]</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label" for="eventDescription">Description</label>
+                        <textarea class="form-control" name="eventDescription" id="eventDescription"></textarea>
+                      </div>
+                      <div class="mb-3 d-flex my-4" style="float: right">
+                        <div style="display: none">
+                          <button type="submit" class="btn btn-primary btn-add-event me-sm-3 me-1">Add</button>
+                          <button type="reset" class="btn btn-label-secondary btn-cancel me-sm-0 me-1" data-bs-dismiss="offcanvas">Cancel</button>
+                        </div>
+                        <div>
+                          <a th:href="@{/maintenances/interventions_list}" class="btn btn-primary btn-delete-event d-none"  target="_blank" >
+                            Plus de détails
+                          </a>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <!-- /Calendar & Modal -->
+            </div>
+          </div>
+
+        </div>
+        <!-- / Content -->
+
+        <div class="content-backdrop fade"></div>
+      </div>
+      <!-- Content wrapper -->
+    </div>
+    <!-- / Layout page -->
+  </div>
+
+
+
+  <!-- Overlay -->
+  <div class="layout-overlay layout-menu-toggle"></div>
+
+
+  <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+  <div class="drag-target"></div>
+
+</div>
+<!-- / Layout wrapper -->
+
+
+
+
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js -->
+
+<script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+<script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+<script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+<script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+<script th:src="@{/assets/vendor/libs/hammer/hammer.js}"></script>
+<script th:src="@{/assets/vendor/libs/i18n/i18n.js}"></script>
+<script th:src="@{/assets/vendor/libs/typeahead-js/typeahead.js}"></script>
+<script th:src="@{/assets/vendor/js/menu.js}"></script>
+
+<!-- endbuild -->
+
+<!-- Vendors JS -->
+<script th:src="@{/assets/vendor/libs/fullcalendar/fullcalendar.js}"></script>
+<script th:src="@{/assets/vendor/libs/@form-validation/umd/bundle/popular.min.js}"></script>
+<script th:src="@{/assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js}"></script>
+<script th:src="@{/assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js}"></script>
+<script th:src="@{/assets/vendor/libs/select2/select2.js}"></script>
+<script th:src="@{/assets/vendor/libs/flatpickr/flatpickr.js}"></script>
+<script th:src="@{/assets/vendor/libs/moment/moment.js}"></script>
+
+<!-- Main JS -->
+<script th:src="@{/assets/js/main.js}"></script>
+
+
+<!-- Page JS -->
+<!--
+<script th:src="@{/assets/js/app-calendar-events.js}"></script>
+-->
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+
+  var interventions_obj = [[${interventions_obj}]];
+
+  console.log(interventions_obj)
+  interventions_obj.map((x) => {x.start = new Date(x.start)});
+
+  console.log(interventions_obj)
+
+  "use strict";
+  let date=new Date,
+          nextDay=new Date((new Date).getTime()+864e5),
+          nextMonth=11===date.getMonth()?new Date(date.getFullYear()+1,0,1):new Date(date.getFullYear(),date.getMonth()+1,1),
+          prevMonth=11===date.getMonth()?new Date(date.getFullYear()-1,0,1):new Date(date.getFullYear(),date.getMonth()-1,1),
+          events=interventions_obj
+
+  console.log(events)
+
+
+
+  "use strict";
+
+  let direction="ltr";
+  (document.querySelector('body').getAttribute('dir') === 'rtl' || document.querySelector('html').getAttribute('dir') === 'rtl')&&(direction="rtl"),
+          document.addEventListener("DOMContentLoaded",function(){
+            {
+              const
+                      v=document.getElementById("calendar"),
+                      m=document.querySelector(".app-calendar-sidebar"),
+                      p=document.getElementById("addEventSidebar"),
+                      f=document.querySelector(".app-overlay"),
+                      g={Termine:"success", Annule:"danger",En_cours:"warning",Nouveau:"info"},
+                      b=document.querySelector(".offcanvas-title"),
+                      h=document.querySelector(".btn-toggle-sidebar"),
+                      y=document.querySelector('button[type="submit"]'),
+                      S=document.querySelector(".btn-delete-event"),
+                      L=document.querySelector(".btn-cancel"),
+                      E=document.querySelector("#eventTitle"),
+                      k=document.querySelector("#eventStartDate"),
+                      x=document.querySelector("#eventURL"),
+                      q=$("#eventLabel"),
+                      K=$("#eventType"),
+                      D=$("#eventGuests"),
+                      P=document.querySelector("#eventLocation"),
+                      M=document.querySelector("#eventDescription"),
+                      A=document.querySelector(".select-all"),
+                      F=[].slice.call(document.querySelectorAll(".input-filter")),
+                      Y=document.querySelector(".inline-calendar");
+
+              let a,l=events, r=!1,e;
+              const C=new bootstrap.Offcanvas(p);
+
+              function t(e) {
+                return e.id?
+                        "<span class='badge badge-dot bg-"+$(e.element).data("label")+" me-2'> </span>"+
+                        e.text:e.text
+              }
+              function n(e) {
+                return e.id?
+                        "<div class='d-flex flex-wrap align-items-center'>" +
+                          "<div class='avatar avatar-xs me-2'>" +
+                            "<img src='"+assetsPath+"img/avatars/"+$(e.element).data("avatar")+"' alt='avatar' class='rounded-circle' />" +
+                          "</div>"+e.text+
+                        "</div>":e.text
+              }
+              var d,o;
+
+              function s(){
+                var e=document.querySelector(".fc-sidebarToggle-button");
+                for(e.classList.remove("fc-button-primary"),e.classList.add("d-lg-none","d-inline-block","ps-0");
+                    e.firstChild;)
+                  e.firstChild.remove();
+                e.setAttribute("data-bs-toggle","sidebar"),
+                        e.setAttribute("data-overlay",""),
+                        e.setAttribute("data-target","#app-calendar-sidebar"),
+                        e.insertAdjacentHTML("beforeend",'<i class="bx bx-menu bx-sm text-heading"></i>')
+              }
+
+              q.length&&q.wrap('<div class="position-relative"></div>').select2({placeholder:"Select value",dropdownParent:q.parent(),templateResult:t,templateSelection:t,minimumResultsForSearch:-1,escapeMarkup:function(e){return e}}),
+              K.length&&K.wrap('<div class="position-relative"></div>').select2({placeholder:"Select value",dropdownParent:K.parent(),templateResult:t,templateSelection:t,minimumResultsForSearch:-1,escapeMarkup:function(e){return e}}),
+              D.length&&D.wrap('<div class="position-relative"></div>').select2({placeholder:"Select value",dropdownParent:D.parent(),closeOnSelect:!1,templateResult:n,templateSelection:n,escapeMarkup:function(e){return e}}),
+              k&&(d=k.flatpickr({enableTime:!0,altFormat:"Y-m-dTH:i:S",onReady:function(e,t,n){n.isMobile&&n.mobileInput.setAttribute("step",null)}})),
+              Y&&(e=Y.flatpickr({monthSelectorType:"static",inline:!0}));
+
+              let i=new Calendar(v,
+                      {
+                        initialView:"dayGridMonth",
+                        events:function(e,t)
+                        {
+                          let n=function()
+                          {
+                            let t=[],e=[].slice.call(document.querySelectorAll(".input-filter:checked"));
+                            return e.forEach(e=>{t.push(e.getAttribute("data-value"))}),t
+                          }();
+                            t(l.filter(function(e){return n.includes(e.extendedProps.calendar.toLowerCase())}))
+                        },
+                        plugins:[dayGridPlugin,interactionPlugin,listPlugin,timegridPlugin],
+                        editable:!0,
+                        dragScroll:!0,
+                        dayMaxEvents:2,
+                        eventResizableFromStart:!0,
+                        customButtons:{sidebarToggle:{text:"Sidebar"}},
+                        headerToolbar:{
+                          start:"sidebarToggle, prev,next, title",
+                          end:"dayGridMonth,timeGridWeek,timeGridDay,listMonth"
+                        },
+                        direction:direction,
+                        initialDate:new Date,navLinks:!0,
+                        eventClassNames:function({event:e}){return["fc-event-"+g[e._def.extendedProps.calendar]]},
+                        dateClick:function(e){
+                          e=moment(e.date).format("YYYY-MM-DD");u(),C.show(),b&&(b.innerHTML="Add Event"),y.innerHTML="Add",y.classList.remove("btn-update-event"),y.classList.add("btn-add-event"),S.classList.add("d-none"),k.value=e
+                        },eventClick:function(e){
+                          e=e,(
+                                  a=e.event).url&&(e.jsEvent.preventDefault(), window.open(a.url,"_blank")),
+                                  C.show(),b&&(b.innerHTML="Consulter détail"),
+                                  y.innerHTML="Update",
+                                  y.classList.add("btn-update-event"),
+                                  y.classList.remove("btn-add-event"),
+                                  S.classList.remove("d-none"),
+                                  E.value=a.title,
+                                  d.setDate(a.start,!0,"Y-m-d"),
+                                  q.val(a.extendedProps.calendar).trigger("change"),
+                                  K.val(a.extendedProps.statut).trigger("change"),
+                          void 0!==a.extendedProps.location&&(P.value=a.extendedProps.location),
+                          void 0!==a.extendedProps.guests&&D.val(a.extendedProps.guests).trigger("change"),
+                          void 0!==a.extendedProps.description&&(M.value=a.extendedProps.description)},
+                        datesSet:function(){s()},
+                        viewDidMount:function(){s()}
+                      });
+              i.render(),s();
+              var c=document.getElementById("eventForm");
+              function u(){x.value="",k.value="",E.value="",P.value="",T.checked=!1,D.val("").trigger("change"),M.value=""}
+              FormValidation.formValidation(c,{
+                fields:
+                        {
+                          eventTitle:{
+                            validators:{notEmpty:{message:"Please enter event title "}}
+                          },
+                          eventStartDate:{
+                            validators:{notEmpty:{message:"Please enter start date "}}
+                          }
+                        },
+                plugins:
+                        {
+                          trigger:new FormValidation.plugins.Trigger,
+                          bootstrap5:new FormValidation.plugins.Bootstrap5({eleValidClass:"",rowSelector:function(e,t){return".mb-3"}}),
+                          submitButton:new FormValidation.plugins.SubmitButton,autoFocus:new FormValidation.plugins.AutoFocus
+                        }
+              }).on("core.form.valid",function(){r=!0}).on("core.form.invalid",function(){r=!1}),h&&h.addEventListener("click",e=>{L.classList.remove("d-none")}),
+                      y.addEventListener("click",e=>{
+                        var t,n;
+                        y.classList.contains("btn-add-event")?r&&(
+                                n=
+                                {
+                                  id:i.getEvents().length+1,
+                                  title:E.value,
+                                  start:k.value,
+                                  startStr:k.value,
+                                  display:"block",
+                                  extendedProps:
+                                          {
+                                            location:P.value,
+                                            guests:D.val(),
+                                            calendar:q.val(),
+                                            statut:K.val(),
+                                            description:M.value
+                                          }
+                                },
+                                x.value&&(n.url=x.value),n=n,l.push(n),i.refetchEvents(),C.hide()):r&&(n=
+                                {
+                                  id:a.id,
+                                  title:E.value,
+                                  start:k.value,
+                                  url:x.value,
+                                  extendedProps:
+                                          {
+                                            location:P.value,
+                                            guests:D.val(),
+                                            calendar:q.val(),
+                                            statut:K.val(),
+                                            description:M.value
+                                          },
+                                  display:"block"
+                                },(t=n).id=parseInt(t.id),l[l.findIndex(e=>e.id===t.id)]=t,i.refetchEvents(),C.hide())}),S.addEventListener("click",e=>{var t;t=parseInt(a.id),l=l.filter(function(e){return e.id!=t}),i.refetchEvents(),C.hide()}),p.addEventListener("hidden.bs.offcanvas",function(){u()}),h.addEventListener("click",e=>{b&&(b.innerHTML="Add Event"),y.innerHTML="Add",y.classList.remove("btn-update-event"),y.classList.add("btn-add-event"),S.classList.add("d-none"),m.classList.remove("show"),f.classList.remove("show")}),A&&A.addEventListener("click",e=>{e.currentTarget.checked?document.querySelectorAll(".input-filter").forEach(e=>e.checked=1):document.querySelectorAll(".input-filter").forEach(e=>e.checked=0),i.refetchEvents()}),F&&F.forEach(e=>{e.addEventListener("click",()=>{document.querySelectorAll(".input-filter:checked").length<document.querySelectorAll(".input-filter").length?A.checked=!1:A.checked=!0,i.refetchEvents()})}),e.config.onChange.push(function(e){i.changeView(i.view.type,moment(e[0]).format("YYYY-MM-DD")),s(),m.classList.remove("show"),f.classList.remove("show")})}});
+
+  /*]]>*/
+
+</script>
+<!--
+<script th:src="@{/assets/js/app-calendar.js}"></script>
+-->
+
+</body>
+
+</html>
+
+<!-- beautify ignore:end -->
+

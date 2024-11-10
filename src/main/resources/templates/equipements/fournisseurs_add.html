@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Equipements </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Equipements /</span>
+                Nouveau fournisseur
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+               <div align="center" th:if="${updatedPass} == 'ok'" class="alert alert-success" role="alert" id="updatedPass">
+                <p>Le mot de passe a été a bien changé</p>
+              </div>
+              <!-- Basic Bootstrap Table -->
+              <div class="col-12" th:if="${privilege?.privilege?.id>2}">
+                <form method="post" th:action="@{/equipements/fournisseurs_add}">
+                  <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                      <div class="card h-100">
+                        <div class="card-header">
+                          <h4 style="font-weight: bold;text-align: center;color:dodgerblue">Informations générales</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-12">
+                              <label class="form-label">Nom/RS <span style="color: red">*</span></label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="rs" type="text" required id="rs">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <label class="form-label">Adresse </label>
+                              <div class="input-group input-group-merge">
+                                <textarea name="address" id="address" style="resize: vertical;" class="form-control" rows="4"></textarea>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">Ville</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="ville" type="text" id="ville">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Code Zip</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="zip" type="number" id="zip" min="0" step="1">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">Pays</label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2"  name="pays_id" onchange="change_pays(this.value,'')" id="pays_id">
+                                  <option value="">Choisir un pays</option>
+                                  <option value="new">--NOUVEAU PAYS--</option>
+                                  <option th:each="v : ${pays}" th:value="${v.rowid}"  th:selected="${v.rowid==12}">
+                                    <span th:text="@{${v.label}+' ('+${v.code}+')'}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Province</label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2"  name="province_id" onchange="change_province(this.value,'')" id="province_id">
+                                  <option value="">Choisir une province</option>
+                                  <option value="new">--NOUVELLE PROVINCE--</option>
+                                  <option th:each="v : ${provinces}" th:value="${v.rowid}">
+                                    <span th:text="@{${v.nom}}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_pays" style="display: none">
+                            <div class="col-md-6">
+                              <label class="form-label">Code du pays</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="code_pays" type="text" id="code_pays">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Libellé du pays</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="libelle_pays" type="text" id="libelle_pays">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_province" style="display: none">
+                            <div class="col-md-6">
+                              <label class="form-label">Code de la province</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="code_province" type="text" id="code_province">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Libellé de la province</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="libelle_province" type="text" id="libelle_province">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_province" style="display: none">
+                            <div class="col-md-6">
+                              <label class="form-label">Region de la province</label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2"  name="region_province" id="region_province">
+                                  <option value="">Choisir une region</option>
+                                  <option th:each="v : ${regions}" th:value="${v.rowid}">
+                                    <span th:text="@{${v.nom}}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">Téléphone</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="phone" type="text" id="phone">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Fax</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="fax" type="text" id="fax">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">Email</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="email" type="email" id="email">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Web</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="web" type="text" id="web">
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <div class="card h-100">
+                        <div class="card-header">
+                          <h4 style="font-weight: bold;text-align: center;color:dodgerblue">Autre informations</h4>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">R.C.</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="rc" type="text"  id="rc">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Patente</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="patente" type="number"  id="patente" min="0" step="1">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">I.F.</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="iff" type="number"  id="iff" min="0" step="1">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">C.N.S.S.</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="cnss" type="number"  id="cnss" min="0" step="1">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">I.C.E.</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="ice" type="number"  id="ice" min="0" step="1">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Forme jur.</label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2"  name="forme_id" onchange="change_forme(this.value,'')" id="forme_id">
+                                  <option value="">Choisir une forme</option>
+                                  <option value="new">--NOUVELLE FORME JURIDIQUE--</option>
+                                  <option th:each="v : ${formes}" th:value="${v.id}">
+                                    <span th:text="@{${v.libelle}}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_forme" style="display: none">
+                            <div class="col-md-6">
+                              <label class="form-label">Code de la forme juridique</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="code_forme" type="text" id="code_forme">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Libellé de la forme juridique</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="libelle_forme" type="text" id="libelle_forme">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_forme" style="display: none">
+                            <div class="col-md-6">
+                              <label class="form-label">Pays de la forme juridique</label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2"  name="pays_forme" id="pays_forme">
+                                  <option value="">Choisir un pays</option>
+                                  <option th:each="v : ${pays}" th:value="${v.rowid}"  th:selected="${v.rowid==12}">
+                                    <span th:text="@{${v.label}+' ('+${v.code}+')'}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">Capital</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="capital" type="number" id="capital" min="0" step="1">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Devise</label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2"  name="devise_id" onchange="change_devise(this.value,'')" id="devise_id">
+                                  <option value="">Choisir un devise</option>
+                                  <option value="new">--NOUVELLE DEVISE--</option>
+                                  <option th:each="v : ${devises}" th:value="${v.code_iso}"  th:selected="${v.code_iso=='MAD'}">
+                                    <span th:text="@{${v.label}+' ('+${v.code_iso}+')'}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_devise" style="display: none">
+                            <div class="col-md-6">
+                              <label class="form-label">Code de la devise</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="code_devise" type="text" id="code_devise">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Libellé de la devise</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="libelle_devise" type="text" id="libelle_devise">
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">Catégorie <span style="color: red">*</span></label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2 "  name="cat_ids" multiple="multiple" required onchange="change_cat(this.value,'')" id="cat_id">
+                                  <option value="">Choisir une categorie</option>
+                                  <option value="new">--NOUVELLE CATÉGORIE--</option>
+                                  <option th:each="v : ${categories}" th:value="${v.id}">
+                                    <span th:text="@{${v.libelle}}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Activité </label>
+                              <div class="input-group input-group-merge">
+                                <select class="form-select select2"  name="activite_id"  onchange="change_activite(this.value,'')" id="activite_id">
+                                  <option value="">Choisir une activité</option>
+                                  <option value="new">--NOUVELLE ACTIVITÉ--</option>
+                                  <option th:each="v : ${activites}" th:value="${v.id}">
+                                    <span th:text="@{${v.code}+' - '+${v.label}}"></span>
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_cat" style="display: none">
+                            <div class="col-md-12">
+                              <label class="form-label">Libellé de la catégorie</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="libelle_cat" type="text" id="libelle_cat">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row div_activite" style="display: none">
+                            <div class="col-md-6">
+                              <label class="form-label">Code de l'activité</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="code_activite" type="text" id="code_activite">
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">Libellé de l'activité</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" name="libelle_activite" type="text" id="libelle_activite">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card-footer" style="text-align: right">
+                          <button class="btn btn-sm btn-success" type="submit">Ajouter</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+
+              </div>
+              <!--/ Basic Bootstrap Table -->
+
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+      });
+    </script>
+
+    <script th:inline="javascript">
+      setTimeout(function() {
+        $("#added").hide(600);
+        $("#deleted").hide(600);
+        $("#updated").hide(600);
+        $("#updatedPass").hide(600);
+      }, 3000);
+
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function change_cat(tache,modal) {
+        var div_cat= ".div_cat";
+        var libelle_cat = "#libelle_cat";
+
+        if(tache != null && tache == "new" ){
+          $(div_cat).show();
+          $(libelle_cat).attr("required",true);
+        }else{
+          $(div_cat).hide();
+          $(libelle_cat).removeAttr("required");
+        }
+      }
+      function change_activite(tache,modal) {
+        var div_activite= ".div_activite";
+        var libelle_activite = "#libelle_activite";
+        var code_activite = "#code_activite";
+
+        if(tache != null && tache == "new" ){
+          $(div_activite).show();
+          $(libelle_activite).attr("required",true);
+          $(code_activite).attr("required",true);
+        }else{
+          $(div_activite).hide();
+          $(libelle_activite).removeAttr("required");
+          $(code_activite).removeAttr("required");
+        }
+      }
+      function change_devise(tache,modal) {
+        var div_devise= ".div_devise";
+        var libelle_devise = "#libelle_devise";
+        var code_devise = "#code_devise";
+
+        if(tache != null && tache == "new" ){
+          $(div_devise).show();
+          $(libelle_devise).attr("required",true);
+          $(code_devise).attr("required",true);
+        }else{
+          $(div_devise).hide();
+          $(libelle_devise).removeAttr("required");
+          $(code_devise).removeAttr("required");
+        }
+      }
+      function change_forme(tache,modal) {
+        var div_forme= ".div_forme";
+        var libelle_forme = "#libelle_forme";
+        var code_forme = "#code_forme";
+        var pays_forme = "#pays_forme";
+
+        if(tache != null && tache == "new" ){
+          $(div_forme).show();
+          $(libelle_forme).attr("required",true);
+          $(code_forme).attr("required",true);
+          $(pays_forme).attr("required",true);
+        }else{
+          $(div_forme).hide();
+          $(libelle_forme).removeAttr("required");
+          $(code_forme).removeAttr("required");
+          $(pays_forme).removeAttr("required");
+        }
+      }
+      function change_pays(tache,modal) {
+        var div_pays= ".div_pays";
+        var libelle_pays = "#libelle_pays";
+        var code_pays = "#code_pays";
+
+        if(tache != null && tache == "new" ){
+          $(div_pays).show();
+          $(libelle_pays).attr("required",true);
+          $(code_pays).attr("required",true);
+        }else{
+          $(div_pays).hide();
+          $(libelle_pays).removeAttr("required");
+          $(code_pays).removeAttr("required");
+        }
+      }
+      function change_province(tache,modal) {
+        var div_province= ".div_province";
+        var libelle_province = "#libelle_province";
+        var region_province = "#region_province";
+        var code_province = "#code_province";
+
+        if(tache != null && tache == "new" ){
+          $(div_province).show();
+          $(libelle_province).attr("required",true);
+          $(region_province).attr("required",true);
+          $(code_province).attr("required",true);
+        }else{
+          $(div_province).hide();
+          $(libelle_province).removeAttr("required");
+          $(region_province).removeAttr("required");
+          $(code_province).removeAttr("required");
+        }
+      }
+
+      /*]]>*/
+    </script>
+
+  </body>
+</html>

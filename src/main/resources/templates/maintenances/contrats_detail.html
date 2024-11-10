@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Maintenances </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Maintenances /</span>
+                <span class="text-muted fw-light">Contrats de maintenances /</span>
+                [[${contrat.code}]]
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${changed} == 'ok'" class="alert alert-success" role="alert" id="changed">
+                <p>Le changement a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+               <div align="center" th:if="${updatedPass} == 'ok'" class="alert alert-success" role="alert" id="updatedPass">
+                <p>Le mot de passe a été a bien changé</p>
+              </div>
+              <!-- Basic Bootstrap Table -->
+              <div class="row"  th:if="${privilege} != null and ${privilege.privilege.id} > 1">
+                <div class="card mt-5" >
+                  <div class="card-header">
+                    <h4 style="font-weight: bold;text-align: center;color:#696cff">[[${contrat.code}]]</h4>
+                    <div style="margin: 2%;text-align: center">
+                      <a class="btn btn-success btn-sm px-2 py-1 validerModal" style="color: white !important;"
+                         th:data-id="${contrat.id}"
+                         th:if="(${privilege} != null and ${privilege.privilege.id} > 3) and ${contrat.status.id == 1}"
+                         title="Valider le contrat" type="button ">
+                        <span class="bx bx-check "></span>
+                      </a>
+                      <a class="btn btn-danger btn-sm px-2 py-1 deleteModal" style="color: white !important;"
+                         th:data-id="${contrat.id}"
+                         th:if="(${privilege} != null and ${privilege.privilege.id} > 3) and ${contrat.status.id == 1}"
+                         title="Supprimer le contrat" type="button ">
+                        <span class="bx bx-trash "></span>
+                      </a>
+                    </div>
+                  </div>
+                  <div class="card-body" >
+                    <div class="row" >
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Code :</span>
+                          <span style="text-align: right" th:text="${contrat.code}"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Observation :</span>
+                          <span style="text-align: right" th:text="${contrat.observation}"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="row" >
+                      <div class="col-md-6" >
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Date début:</span>
+                          <span style="text-align: right" th:text="${#dates.format(contrat.date_debut, 'dd/MM/yyyy')}"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6" >
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Date fin:</span>
+                          <span style="text-align: right" th:text="${#dates.format(contrat.date_fin, 'dd/MM/yyyy')}"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="row" >
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Fournisseur :</span>
+                          <span style="text-align: right" th:text="${contrat.fournisseur.rs}"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#3874ff">Statut :</span>
+                          <span style="text-align: right" th:switch="${contrat.status.id}">
+                                    <span th:case="1" style="font-size: 8px;padding: 4px" class="btn btn-sm btn-info" th:text="${contrat.status.libelle}"></span>
+                                    <span th:case="2" style="font-size: 8px;padding: 4px" class="btn btn-sm btn-success" th:text="${contrat.status.libelle}"></span>
+                                    <span th:case="3" style="font-size: 8px;padding: 4px" class="btn btn-sm btn-danger" th:text="${contrat.status.libelle}"></span>
+                                </span>
+                        </label>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                <div class="card mt-5" >
+                  <div class="card-body" >
+                    <div class="row">
+                      <table class="table display nowrap table-striped"
+                             id="dataTable1" aria-describedby="dataTable1_info">
+                        <thead>
+                        <tr>
+                          <th style="width: 30%; background-color: #696cff;color:white">Equipement <span style="color: red">*</span></th>
+                          <th style="width: 30%; background-color: #696cff;color:white">Type de maintenance <span style="color: red">*</span></th>
+                          <th style="width: 10%; background-color: #696cff;color:white">Actions</th>
+                        </tr>
+                        </thead>
+                        <thead th:if="${contrat.status.id == 1}">
+                        <form role="form" id="add_detail" th:action="@{/maintenances/contrats_detail_add}" method="post">
+                          <input type="hidden" th:value="${contrat.id}" id="contrat_id" name="contrat_id" />
+                          <tr role="row">
+                            <div class="form-wizard" >
+                              <th style="width: 30%; background-color: #696cff;color:white">
+                                <select class="form-select" name="equipement_id" required >
+                                  <option value="" selected="selected">-- Choisir un équipement --</option>
+                                  <th:block th:each="a : ${equipements}">
+                                    <option th:value="${a.id}" th:text="${a.code+' - '+a.libelle}"></option>
+                                  </th:block>
+                                </select>
+                              </th>
+                              <th style="width: 30%; background-color: #696cff;color:white">
+                                <select class="form-select" name="type_id" required  onchange="change_type(this.value,'')">
+                                  <option value="" selected="selected">-- Choisir un type de maintenance --</option>
+                                  <th:block th:each="a : ${types}"  >
+                                    <option th:value="${a.id}" th:text="${a.libelle}"></option>
+                                  </th:block>
+                                </select>
+                              </th>
+                              <th style="width: 10%;background-color: #696cff;color:white" id="submitAjout">
+                                <button class="btn btn-sm btn-warning" title="Ajouter" type="submit">
+                                  <i class="bx bx-plus"></i>
+                                </button>
+                              </th>
+                            </div>
+                          </tr>
+                          <tr role="row" id="div_intervention_preventive" style="display: none">
+                            <div class="form-wizard" >
+                              <th style="width: 30%;">
+                                <label class="form-label">Réf. intervention <span style="color: red">*</span></label>
+                                <div class="input-group input-group-merge">
+                                  <input class="form-control" name="intervention_code" id="intervention_code" type="text" placeholder="réf. intervention"/>
+                                </div>
+                              </th>
+                              <th style="width: 30%;">
+                                  <label class="form-label">Type d'intervention <span style="color: red">*</span></label>
+                                  <div class="input-group input-group-merge">
+                                    <select class="form-select"  name="intervention_type" id="intervention_type">
+                                      <option value="" selected="selected">-- Choisir un type d'intervention --</option>
+                                      <th:block th:each="a : ${intervention_types}">
+                                        <option th:value="${a.id}" th:text="${a.libelle}" th:selected="${a.id == 1}"></option>
+                                      </th:block>
+                                    </select>
+                                  </div>
+
+                              </th>
+                              <th style="width: 10%;">
+                                <label class="form-label">Date début <span style="color: red">*</span></label>
+                                <div class="input-group input-group-merge">
+                                  <input class="form-control"  name="intervention_date" id="intervention_date" type="datetime-local">
+                                </div>
+                              </th>
+                            </div>
+                          </tr>
+                        </form>
+
+                        </thead>
+                        <tbody role="alert" aria-live="polite" aria-relevant="all"
+                               id="data">
+                        <tr th:each="b : ${details}" th:id="'tr_'+${b.id}">
+                          <td style="text-align: left;" th:text="${b.equipement.code+' - '+b.equipement.libelle}"></td>
+                          <td style="text-align: left;" th:text="${b.type.libelle}"></td>
+                          <td  class="actions" style="text-align: center;" >
+                            <button th:if="${contrat.status.id == 1} and ${b.canDelete}" class=" btn btn-sm btn-danger px-2 py-1" title="Supprimer"
+                                    th:onclick="'showConfirmation('+${b.id}+')'" >
+                              <i class="bx bx-trash"></i>
+                            </button>
+                            <a class="btn btn-primary btn-sm px-2 py-1 rounded-1"
+                               th:if="${b.type != null and b.type.id == 1}"
+                               title="Consulter l'intervention" th:href="@{/maintenances/interventions_detail}+'/'+${b.intervention_id}">
+                              <i class="bx bx-wrench"></i>
+                            </a>
+                          </td>
+                        </tr>
+                        <tr  th:if="${details.size() == 0}">
+                          <td colspan="3" style="text-align: center">Aucun résultat</td>
+                        </tr>
+                        </tbody>
+                      </table>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!--/ Basic Bootstrap Table -->
+
+
+              <div aria-hidden="true" class="modal fade" id="validerModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Validation : Contrat de maintenance</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/contrats_valider}">
+                      <input type="hidden" name="action" value="detail" />
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment valider ce contrat ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title text-white">Suppression :  Contrat de maintenance</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/contrats_delete}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment supprimer ce contrat ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div aria-hidden="true" class="modal fade" id="deleteDetailModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Suppression : Equipement</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/contrats_detail_delete}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment supprimer cette ligne ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input type="hidden" id="id_detail" name="id" />
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script th:inline="javascript">
+
+
+      function showConfirmation(id) {
+        $('#deleteDetailModal .modal-body #id_detail').val(id);
+        $('#deleteDetailModal').modal('show');
+      }
+
+      $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $("#deleteModal .modal-body #id").val(id);
+        $("#deleteModal").modal('show');
+      });
+      $(document).on("click", ".validerModal", function () {
+        var id = $(this).data('id');
+        $("#validerModal .modal-body #id").val(id);
+        $("#validerModal").modal('show');
+      });
+      $(document).on("click", ".addModal", function () {
+
+        var id = $(this).data('id');
+        $("#addModal .modal-body #id").val(id);
+        $("#addModal").modal('show');
+      });
+
+
+      /*]]>*/
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+      });
+    </script>
+
+    <script th:inline="javascript">
+      setTimeout(function() {
+        $("#added").hide(600);
+        $("#deleted").hide(600);
+        $("#updated").hide(600);
+        $("#changed").hide(600);
+        $("#updatedPass").hide(600);
+      }, 3000);
+
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function change_type(type,modal) {
+        console.log(type)
+        if(type != null && type == 1 ){
+          $("#div_intervention_preventive").show();
+          $("#intervention_date").attr("required",true);
+          $("#intervention_code").attr("required",true);
+          $("#intervention_type").attr("required",true);
+
+        }else{
+          $("#div_intervention_preventive").hide();
+          $("intervention_date").removeAttr("required");
+          $("intervention_type").removeAttr("required");
+          $("intervention_code").removeAttr("required");
+
+        }
+
+      }
+
+
+      /*]]>*/
+    </script>
+
+  </body>
+</html>

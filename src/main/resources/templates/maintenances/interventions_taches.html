@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Maintenances </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+  <style>
+    .dt-length, .dt-info{
+      margin-left: 1rem;
+    }
+    .dt-input {
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Maintenances /</span>
+                <span class="text-muted fw-light">Interventions /</span>
+                Liste des tâches
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${changed} == 'ok'" class="alert alert-success" role="alert" id="changed">
+                <p>Le changement a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+               <div align="center" th:if="${updatedPass} == 'ok'" class="alert alert-success" role="alert" id="updatedPass">
+                <p>Le mot de passe a été a bien changé</p>
+              </div>
+              <!-- Basic Bootstrap Table -->
+              <div class="card">
+                <h4 class="card-header" style="font-weight: bold;text-align: center;color:#696cff">[[${intervention.code}]]</h4>
+                <div>
+                  <div style="margin: 2%;text-align: right">
+                    <a class="btn btn-primary btn-sm px-2 py-1 rounded-1 addModal" style="color: white !important;"
+                       th:data-id="${intervention.id}"
+                       th:if="(${privilege} != null and ${privilege.privilege.id} > 1 ) and ${intervention.status.id <=2}"
+                       title="Nouvlle tâche"
+                       type="button ">
+                      <span class="bx bx-plus"> </span>
+                    </a>
+                  </div>
+
+
+                  <table id="myDataTable" class="table">
+                    <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Ouvrier</th>
+                      <th>Durée réelle (h)</th>
+                      <th>Libellé de la tâche</th>
+                      <th>Groupe</th>
+                      <th>Temps estimé (h)</th>
+                      <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody class="list">
+                    <tr th:each="c :${list}">
+                      <td style="" th:text="${#dates.format(c.date, 'dd/MM/yyyy')}"></td>
+                      <td><span th:text="${c.ouvrier.cin+'-'+c.ouvrier.nom+' '+c.ouvrier.prenom}"></span></td>
+                      <td th:text="${c.duree}" align="right" th:value="${#numbers.formatDecimal(c.duree, 1, 'DEFAULT', 2, 'DEFAULT')}"></td>
+                      <td><span th:text="${#strings.toUpperCase(c.tache.libelle)}"></span></td>
+                      <td><span th:text="${#strings.toUpperCase(c.tache.groupe)}"></span></td>
+                      <td th:text="${c.tache.temps_estime}" align="right" th:value="${#numbers.formatDecimal(c.tache.temps_estime, 1, 'DEFAULT', 2, 'DEFAULT')}"></td>
+                      <td>
+
+                        <a class="btn btn-danger btn-sm px-2 py-1 deleteModal" style="color: white !important;"
+                           th:data-id="${c.id}"
+                           th:if="(${privilege} != null and ${privilege.privilege.id} > 3) and ${intervention.status.id <=2}"
+                           title="Supprimer" type="button ">
+                          <span class="bx bx-trash "></span>
+                        </a>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <h1 class="card-footer"></h1>
+
+              </div>
+              <!--/ Basic Bootstrap Table -->
+
+
+              <div aria-hidden="true" class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title text-white">Suppression : Tâche</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/deleteTache}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment supprimer cette tache ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" class="modal fade" id="addModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white" id="exampleModalLabel">Ajout : Tâche</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/addTache}">
+
+                      <div class="modal-body">
+                        <input id="id" name="id" type="hidden">
+                        <div class="row" >
+                          <div class="col-md-6">
+                            <label class="form-label">Date  <span style="color: red">*</span></label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="debut" name="date" type="date" required>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Tâche  <span style="color: red">*</span></label>
+                            <div class="input-group input-group-merge">
+                              <select class="form-select"  name="tache_id" required  onchange="change_tache(this.value,'addModal')" id="tache">
+                                <option value="">Choisir une tâche</option>
+                                <option value="new">--NOUVELLE TÂCHE--</option>
+                                <option th:each="v : ${taches}" th:value="${v.id}">
+                                  <span th:text="@{${v.libelle}}"></span>
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row div_tache" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Code de la tâche  <span style="color: red">*</span></label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="code_tache" type="text" id="code_tache">
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Libelle de la tâche  <span style="color: red">*</span></label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="libelle_tache" type="text" id="libelle_tache">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row div_tache" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Groupe de la tâche  <span style="color: red">*</span></label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="groupe_tache" type="text" id="groupe_tache">
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Temps estimé de la tâche (h)  <span style="color: red">*</span> </label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="temps_tache" type="number" step="0.1" min="0" id="temps_tache">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row" >
+                          <div class="col-md-6">
+                            <label class="form-label">Employé</label>
+                            <div class="input-group input-group-merge">
+                              <select class="form-select "  name="employe_id" required id="employe">
+                                <option value="">Choisir un employé</option>
+                                <option th:each="v : ${ouvriers}" th:value="${v.id}">
+                                  <span th:text="@{${v.cin}+'-'+${v.nom}+' '+${v.prenom}}"></span>
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Durée faite (h)  <span style="color: red">*</span></label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="duree" name="duree" type="number" min="0" step="0.1" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row" >
+                          <div class="col-md-12">
+                            <label class="form-label">Observations</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="observation" name="observation" type="text">
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Fermer
+                        </button>
+                        <button class="btn btn-sm btn-success" type="submit">Ajouter</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script th:inline="javascript">
+
+
+
+      $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $("#deleteModal .modal-body #id").val(id);
+        $("#deleteModal").modal('show');
+      });
+      $(document).on("click", ".validModal", function () {
+        var id = $(this).data('id');
+        $("#validModal .modal-body #id").val(id);
+        $("#validModal").modal('show');
+      });
+
+      $(document).on("click", ".addModal", function () {
+
+        var id = $(this).data('id');
+        $("#addModal .modal-body #id").val(id);
+        $("#addModal").modal('show');
+      });
+
+      /*]]>*/
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+      });
+    </script>
+
+    <script th:inline="javascript">
+      setTimeout(function() {
+        $("#added").hide(600);
+        $("#deleted").hide(600);
+        $("#updated").hide(600);
+        $("#changed").hide(600);
+        $("#updatedPass").hide(600);
+      }, 3000);
+
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function change_tache(tache,modal) {
+        var div_tache = "#"+modal+" .modal-body .div_tache";
+        var code_tache = "#"+modal+" .modal-body #code_tache";
+        var libelle_tache = "#"+modal+" .modal-body #libelle_tache";
+        var groupe_tache = "#"+modal+" .modal-body #groupe_tache";
+        var temps_tache = "#"+modal+" .modal-body #temps_tache";
+        if(tache != null && tache == "new" ){
+          $(div_tache).show();
+          $(code_tache).attr("required",true);
+          $(libelle_tache).attr("required",true);
+          $(groupe_tache).attr("required",true);
+          $(temps_tache).attr("required",true);
+        }else{
+          $(div_tache).hide();
+          $(code_tache).removeAttr("required");
+          $(libelle_tache).removeAttr("required");
+          $(groupe_tache).removeAttr("required");
+          $(temps_tache).removeAttr("required");
+        }
+
+      }
+
+      $(document).ready(function() {
+        $('#myDataTable').DataTable({
+          "language": {
+            "emptyTable": "Aucun résultat",
+            "search": "",
+            "searchPlaceholder": "Recherche ...",
+            "show": "Length:",
+            "zeroRecords": "Pas de résultats",
+            "info": "Afficher _START_ à _END_ de _TOTAL_",
+            "infoEmpty": "Afficher 0 à 0 de 0",
+            "lengthMenu": "_MENU_ Lignes sont affichées",
+          },
+          order: [],
+        });
+      });
+      /*]]>*/
+    </script>
+
+  </body>
+</html>

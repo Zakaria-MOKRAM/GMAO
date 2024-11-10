@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Maintenances </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Maintenances /</span>
+                <span class="text-muted fw-light">Interventions /</span>
+                [[${intervention.code}]]
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${changed} == 'ok'" class="alert alert-success" role="alert" id="changed">
+                <p>Le changement a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+               <div align="center" th:if="${updatedPass} == 'ok'" class="alert alert-success" role="alert" id="updatedPass">
+                <p>Le mot de passe a été a bien changé</p>
+              </div>
+              <div align="center" th:if="${finished} == 'ok'" class="alert alert-success" role="alert" id="finished">
+                <p>L'intervention est terminée</p>
+              </div>
+              <div align="center" th:if="${started} == 'ok'" class="alert alert-success" role="alert" id="started">
+                <p>L'intervention est démarrée</p>
+              </div>
+
+              <!-- Basic Bootstrap Table -->
+              <div class="row"  th:if="${privilege} != null and ${privilege.privilege.id} > 1">
+                <div class="card" >
+                  <div class="card-header">
+                    <h4 style="font-weight: bold;text-align: center;color:#696cff">[[${intervention.code}]]</h4>
+                    <h6 style="font-weight: bold;text-align: center;color:#696cff">[[${intervention.observation}]]</h6>
+
+                    <div style="text-align: center">
+                      <a class="btn btn-info btn-sm px-2 py-1 rounded-1"  th:if="(${privilege} != null and ${privilege.privilege.id} > 2) and ${intervention.status.id ==1}"
+                         title="Modifier une intervention" th:href="@{/maintenances/interventions_edit}+'/'+${intervention.id}">
+                        <span class="bx bx-edit"> </span>
+                      </a>
+                      <a class="btn btn-success btn-sm px-2 py-1 rounded-1"
+                         title="Historiques du statut" th:href="@{/maintenances/interventions_status}+'/'+${intervention.id}">
+                        <i class="bx bx-history"></i>
+                      </a>
+                      <a class="btn btn-primary btn-sm px-2 py-1 rounded-1"
+                         title="Consulter liste des tâches" th:href="@{/maintenances/interventions_taches}+'/'+${intervention.id}">
+                        <span class="bx bx-list-ol"> </span>
+                      </a>
+                      <a class="btn btn-success btn-sm px-2 py-1 demarrerModal" style="color: white !important;"
+                         th:data-id="${intervention.id}"
+                         th:if="(${privilege} != null and ${privilege.privilege.id} > 3) and ${intervention.status.id == 1}"
+                         title="Démarrer" type="button ">
+                        <span class="bx bx-play "></span>
+                      </a>
+                      <a class="btn btn-warning btn-sm px-2 py-1 terminerModal" style="color: white !important;"
+                         th:data-id="${intervention.id}"
+                         th:if="(${privilege} != null and ${privilege.privilege.id} > 3) and ${intervention.status.id == 2}"
+                         title="Terminer" type="button ">
+                        <span class="bx bx-key "></span>
+                      </a>
+                      <a class="btn btn-danger btn-sm px-2 py-1 deleteModal" style="color: white !important;"
+                         th:data-id="${intervention.id}"
+                         th:if="(${privilege} != null and ${privilege.privilege.id} > 3) and ${intervention.status.id == 1}"
+                         title="Supprimer" type="button ">
+                        <span class="bx bx-trash "></span>
+                      </a>
+                    </div>
+
+                  </div>
+                  <div class="card-body" >
+                    <div class="row" >
+                      <div class="col-md-6" th:if="${intervention.installation} != null">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#696cff">Installation :</span>
+                          <span style="text-align: right" th:text="${intervention.installation.libelle}"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#696cff">Équipement :</span>
+                          <span style="text-align: right" th:text="${intervention.equipement.libelle}"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#696cff">Type :</span>
+                          <span style="text-align: right" th:text="${intervention.type.libelle}"></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="row" >
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <span style="font-weight: bold;color:#696cff">Date :</span>
+                          <span style="text-align: right" th:text="${#dates.format(intervention.date_debut, 'dd/MM/yyyy')}"></span>
+                        </label>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          <!--suppress LanguageDetectionInspection -->
+                          <span style="font-weight: bold;color:#696cff">statut :</span>
+                          <span style="text-align: right" th:switch="${intervention.status.id}" >
+                                    <span th:case="1" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-info" th:text="${intervention.status.libelle}"></span>
+                                    <span th:case="2" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-warning" th:text="${intervention.status.libelle}"></span>
+                                    <span th:case="3" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-success" th:text="${intervention.status.libelle}"></span>
+                                    <span th:case="4" style="font-size: 11px;padding: 4px" class="btn btn-sm btn-danger" th:text="${intervention.status.libelle}"></span>
+                                </span>
+                        </label>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+
+                  <div class="card-body" >
+                    <div class="alert alert-primary"
+                         th:if="${soutraitances.size() == 0}">
+                      <strong style="color: red">INFO:</strong>
+                      <span th:text="'Aucune sous-traitance enregistrée pour le moment.'" style="color: white; align: center"></span>
+                    </div>
+                    <div class="table-responsive" th:if="${soutraitances.size() != 0}">
+                      <table class="table table-hover table-sm" id="myDataTable4">
+                        <thead class="bg-light">
+                        <tr>
+                          <th>Date</th>
+                          <th>ST Réf.</th>
+                          <th>Fournisseur</th>
+                          <th>Montant</th>
+                        </tr>
+                        </thead>
+                        <tbody class="list">
+                        <tr th:each="c :${soutraitances}">
+                          <td style="" th:text="${#dates.format(c.date, 'dd/MM/yyyy')}"></td>
+                          <td style="" th:text="${c.code}"></td>
+                          <td style="" th:text="${c.sous_traitant.rs}"></td>
+                          <td align="right" th:text="${#numbers.formatDecimal(c.montant, 1, 'DEFAULT', 2, 'DEFAULT')}"></td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!--/ Basic Bootstrap Table -->
+
+
+              <div aria-hidden="true" class="modal fade" id="editModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Modification : Intervention</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/interventions_edit}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <input id="id" name="id" type="hidden">
+                          <div class="col-md-12">
+                            <label class="form-label">Date</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="date" name="date" type="date" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label class="form-label">Libelle</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="libelle" name="libelle" type="text" required>
+                            </div>
+                          </div>
+
+                        </div>
+                        <div class="row" >
+                          <div class="col-md-12">
+                            <label class="form-label">Emplacement</label>
+                            <div class="input-group input-group-merge">
+                              <select class="form-select "  name="emplacement_id" required id="emplacement">
+                                <option value="">Choisir un emplacement</option>
+                                <option th:each="v : ${emplacements}" th:value="${v.id}">
+                                  <span th:text="@{${v.libelle}}"></span>
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Fermer
+                        </button>
+                        <button class="btn btn-sm btn-success" type="submit">Modifier</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div aria-hidden="true" class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title text-white">Suppression : Intervention</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/interventions_delete}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment supprimer cette intervention ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" class="modal fade" id="demarrerModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Démarrage : Intervention</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/interventions_demarrer}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment démarrer cette intervention ?</h6>
+                          </div>
+                          <div class="col-md-6">
+                            <input id="id" name="id" type="hidden">
+                          </div>
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" class="modal fade" id="terminerModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white">Terminer : Intervention</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="fas fa-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/interventions_terminer}">
+
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <h6 class="text-center">Voulez-vous vraiment terminer cette intervention ?</h6>
+                          </div>
+                          <div class="row">
+                            <input id="id" name="id" type="hidden">
+                            <div class="col-md-12">
+                              <label class="form-label">Date de terminaison</label>
+                              <div class="input-group input-group-merge">
+                                <input class="form-control" id="date" name="date" type="date" required>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Non</button>
+                        <button class="btn btn-sm btn-success" type="submit">
+                          Oui
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div aria-hidden="true" class="modal fade" id="addModalTache" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title text-white" id="exampleModalLabel">Ajout : Tâche</h5>
+                      <button aria-label="Close" class="btn p-1" data-bs-dismiss="modal" type="button"><span
+                              class="bx bx-times fs--1"></span></button>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/addTache}">
+                      <input type="hidden" name="action" value="detail" />
+                      <div class="modal-body">
+                        <input id="id" name="id" type="hidden">
+                        <div class="row" >
+                          <div class="col-md-6">
+                            <label class="form-label">Date</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="debut" name="date" type="date" required>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Tâche</label>
+                            <div class="input-group input-group-merge">
+                              <select class="form-select"  name="tache_id" required  onchange="change_tache(this.value,'addModalTache')" id="tache">
+                                <option value="">Choisir une tâche</option>
+                                <option value="new">--NOUVELLE TÂCHE--</option>
+                                <option th:each="v : ${liste_taches}" th:value="${v.id}">
+                                  <span th:text="@{${v.libelle}}"></span>
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row div_tache" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Code de la tâche</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="code_tache" type="text" id="code_tache">
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Libelle de la tâche</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="libelle_tache" type="text" id="libelle_tache">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row div_tache" style="display: none">
+                          <div class="col-md-6">
+                            <label class="form-label">Groupe de la tâche</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="groupe_tache" type="text" id="groupe_tache">
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Temps estimé de la tâche (h) </label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" name="temps_tache" type="number" step="0.1" min="0" id="temps_tache">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row" >
+                          <div class="col-md-6">
+                            <label class="form-label">Employé</label>
+                            <div class="input-group input-group-merge">
+                              <select class="form-select "  name="employe_id" required id="employe">
+                                <option value="">Choisir un employé</option>
+                                <option th:each="v : ${ouvriers}" th:value="${v.id}">
+                                  <span th:text="@{${v.cin}+'-'+${v.nom}+' '+${v.prenom}}"></span>
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Durée faite (h)</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="duree" name="duree" type="number" min="0" step="0.1" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row" >
+                          <div class="col-md-12">
+                            <label class="form-label">Observations</label>
+                            <div class="input-group input-group-merge">
+                              <input class="form-control" id="observation" name="observation" type="text">
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-sm btn-danger" data-bs-dismiss="modal" type="button">Fermer
+                        </button>
+                        <button class="btn btn-sm btn-success" type="submit">Ajouter</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script th:inline="javascript">
+
+      $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $("#deleteModal .modal-body #id").val(id);
+        $("#deleteModal").modal('show');
+      });
+      $(document).on("click", ".demarrerModal", function () {
+        var id = $(this).data('id');
+        $("#demarrerModal .modal-body #id").val(id);
+        $("#demarrerModal").modal('show');
+      });
+      $(document).on("click", ".terminerModal", function () {
+        var id = $(this).data('id');
+        $("#terminerModal .modal-body #id").val(id);
+        $("#terminerModal").modal('show');
+      });
+
+      $(document).on("click", ".editModal", function () {
+        var date = $(this).data('date');
+        var id = $(this).data('id');
+        $("#editModal .modal-body #id").val(id);
+        $("#editModal .modal-body #libelle").val($(this).data('libelle'));
+        $("#editModal .modal-body #emplacement").val($(this).data('emplacement'));
+        document.getElementById("date").valueAsDate = new Date(date);
+        $("#editModal").modal('show');
+      });
+
+      $(document).on("click", ".addModalTache", function () {
+
+        var id = $(this).data('id');
+        $("#addModalTache .modal-body #id").val(id);
+        $("#addModalTache").modal('show');
+      });
+
+
+      /*]]>*/
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+      });
+    </script>
+
+    <script th:inline="javascript">
+      setTimeout(function() {
+        $("#added").hide(600);
+        $("#deleted").hide(600);
+        $("#updated").hide(600);
+        $("#changed").hide(600);
+        $("#started").hide(600);
+      }, 3000);
+
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function change_tache(tache,modal) {
+        var div_tache = "#"+modal+" .modal-body .div_tache";
+        var code_tache = "#"+modal+" .modal-body #code_tache";
+        var libelle_tache = "#"+modal+" .modal-body #libelle_tache";
+        var groupe_tache = "#"+modal+" .modal-body #groupe_tache";
+        var temps_tache = "#"+modal+" .modal-body #temps_tache";
+        if(tache != null && tache == "new" ){
+          $(div_tache).show();
+          $(code_tache).attr("required",true);
+          $(libelle_tache).attr("required",true);
+          $(groupe_tache).attr("required",true);
+          $(temps_tache).attr("required",true);
+        }else{
+          $(div_tache).hide();
+          $(code_tache).removeAttr("required");
+          $(libelle_tache).removeAttr("required");
+          $(groupe_tache).removeAttr("required");
+          $(temps_tache).removeAttr("required");
+        }
+
+      }
+
+
+
+      /*]]>*/
+    </script>
+
+  </body>
+</html>

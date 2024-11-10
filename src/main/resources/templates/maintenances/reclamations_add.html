@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html
+        lang="en"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        th:data-assets-path="@{/assets/}"
+        data-template="vertical-menu-template-free"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="utf-8" />
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+  />
+
+  <title>jwork GMAO - Maintenances </title>
+
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- Icons. Uncomment required icon fonts -->
+  <link rel="stylesheet" th:href="@{/assets/vendor/fonts/boxicons.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/core.css}" class="template-customizer-core-css" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/css/theme-default.css}" class="template-customizer-theme-css" />
+  <link rel="stylesheet" th:href="@{/assets/css/demo.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}" />
+  <link rel="stylesheet" th:href="@{/assets/vendor/libs/apex-charts/apex-charts.css}" />
+
+  <script th:src="@{/assets/vendor/js/helpers.js}"></script>
+  <script th:src="@{/assets/js/config.js}"></script>
+
+</head>
+
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <style th:replace="/shared/sidebar"></style>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <style th:replace="/shared/navbar"></style>
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <div th:if="${privilege==null} or ${privilege?.privilege?.id==1}">
+              <div class="alert alert-danger" role="alert">L'accès à cette page n'est pas autorisé .</div>
+            </div>
+            <div class="container-xxl flex-grow-1 container-p-y" th:if="${privilege?.privilege?.id>1}">
+              <h6 class="fw-bold py-3 mb-4">
+                <span class="text-muted fw-light">Dashboard /</span>
+                <span class="text-muted fw-light">Maintenances /</span>
+                <span class="text-muted fw-light">Anomalies /</span>
+                Ajouter une réclamation
+              </h6>
+
+              <div align="center" th:if="${added} == 'ok'" class="alert alert-success" role="alert" id="added">
+                <p>L'ajout a bien été effectué</p>
+              </div>
+              <div align="center" th:if="${demarre} == 'ok'" class="alert alert-success" role="alert" id="demarre">
+                <p>La réclamation est commencée avec succés</p>
+              </div>
+              <div align="center" th:if="${traite} == 'ok'" class="alert alert-success" role="alert" id="traite">
+                <p>La réclamation est traitée avec succés</p>
+              </div>
+              <div align="center" th:if="${finished} == 'ok'" class="alert alert-success" role="alert" id="finished">
+                <p>L'intervention est terminée</p>
+              </div>
+              <div align="center" th:if="${started} == 'ok'" class="alert alert-success" role="alert" id="started">
+                <p>L'intervention est démarrée</p>
+              </div>
+              <div align="center" th:if="${updated} == 'ok'" class="alert alert-success" role="alert" id="updated">
+                <p>La modification a bien été effectuée</p>
+              </div>
+              <div align="center" th:if="${deleted} == 'ok'" class="alert alert-danger" role="alert" id="deleted">
+                <p>La suppression a bien été effectuée</p>
+              </div>
+
+              <!-- Basic Bootstrap Table -->
+              <div class="col-12" th:if="${privilege?.privilege?.id>2}">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="alert alert-danger" id="msg_ref_val"
+                             style="display: none;">
+                          <strong>Attention!</strong> La référence saisie est déjà utilisée pour une autre insallation.
+                        </div>
+                        <div class="alert alert-success" id="msg_ref_dup"
+                             style="display: none;">
+                          <strong>INFO :</strong> La référence saisie est valide
+                        </div>
+                      </div>
+                    </div>
+                    <form method="post" th:action="@{/maintenances/reclamations_add}">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <label class="form-label">Date <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <input class="form-control" id="date" name="date" type="date" required>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Titre <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <input class="form-control" id="titre" name="titre" type="text" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row" >
+                        <div class="col-md-6">
+                          <label class="form-label">Emplacement <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <select class="form-select"  name="emplacement_id" required onchange="change_emplacement(this.value,'addModal')" id="emplacement_id">
+                              <option value="">Choisir un emplacement</option>
+                              <option value="new">--NOUVEAU EMPLACEMENT--</option>
+                              <option th:each="v : ${emplacements}" th:value="${v.id}">
+                                <span th:text="@{${v.libelle}}"></span>
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Equipement</label>
+                          <div class="input-group input-group-merge">
+                            <select class="form-select"  name="equipement_id" id="equipement_id" >
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row div_emplacement" style="display: none">
+                        <div class="col-md-6">
+                          <label class="form-label">Code de l'emplacement <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <input class="form-control" name="code_emplacement" type="text" id="code_emplacement">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Libelle de l'emplacement <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <input class="form-control" name="libelle_emplacement" type="text" id="libelle_emplacement">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <label class="form-label">Urgent <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <div>
+                              <input id="oui" name="urgent" type="radio" value="oui">
+                              <label for="oui" style="padding-left: 5px">Oui</label>
+                            </div>
+                            <div style="padding-left: 20px">
+                              <input id="non" name="urgent" type="radio" value="non" checked>
+                              <label for="non" style="padding-left: 5px">Non</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Service  </label>
+                          <div class="input-group input-group-merge">
+                            <select class="form-select "  name="service_id"  onchange="change_service(this.value,'addModal')" id="service_id">
+                              <option value="">Choisir un service</option>
+                              <option value="new">--NOUVEAU SERVICE--</option>
+                              <option th:each="v : ${services}" th:value="${v.id}">
+                                <span th:text="@{${v.libelle}}"></span>
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row div_service" style="display: none">
+                        <div class="col-md-6">
+                          <label class="form-label">Libelle du service  <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <input class="form-control" name="libelle_service" type="text" id="libelle_service">
+                          </div>
+                        </div>
+                  </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <label class="form-label">Responsable  </label>
+                          <div class="input-group input-group-merge">
+                            <select class="form-select "  name="employe_id"  id="employe_id">
+                              <option value="">Choisir un responsable</option>
+                              <option th:each="v : ${utilisateurs}" th:value="${v.id}">
+                                <span th:text="@{${v.firstName}+' '+${v.lastName}}"></span>
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label class="form-label">Message <span style="color: red">*</span></label>
+                          <div class="input-group input-group-merge">
+                            <textarea name="libelle" id="libelle" style="resize: vertical;" class="form-control" required></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row h-100" >
+                        <div class="col-12 col-md-12">
+                          <div class="">
+                            <div class="" style="text-align: center;">
+                              <button class="btn btn-sm btn-success" type="submit">Ajouter</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                </form>
+                  </div>
+                </div>
+              </div>
+              <!--/ Basic Bootstrap Table -->
+
+              <hr class="my-5" />
+              <!--/ Responsive Table -->
+            </div>
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script th:src="@{/assets/vendor/libs/jquery/jquery.js}"></script>
+    <script th:src="@{/assets/vendor/libs/popper/popper.js}"></script>
+    <script th:src="@{/assets/vendor/js/bootstrap.js}"></script>
+    <script th:src="@{/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+
+    <script th:src="@{/assets/vendor/js/menu.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script th:inline="javascript">
+
+
+      $(document).on("click", ".addModal", function () {
+        var id = $(this).data('id');
+        $("#addModal .modal-body #id").val(id);
+        $("#addModal").modal('show');
+      });
+      $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $("#deleteModal .modal-body #id").val(id);
+        $("#deleteModal").modal('show');
+      });
+      $(document).on("click", ".deletePJModal", function () {
+        var id = $(this).data('id');
+        $("#deletePJModal .modal-body #id").val(id);
+        $("#deletePJModal").modal('show');
+      });
+      $(document).on("click", ".demarrerModal", function () {
+        var id = $(this).data('id');
+        $("#demarrerModal .modal-body #id").val(id);
+        $("#demarrerModal").modal('show');
+      });
+      $(document).on("click", ".traiterModal", function () {
+        var id = $(this).data('id');
+        $("#traiterModal .modal-body #id").val(id);
+        $("#traiterModal").modal('show');
+      });
+
+
+
+      /*]]>*/
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $("form").submit(function() {
+          $(this).submit(function() {
+            return false;
+          });
+          return true;
+        });
+
+        var date = new Date();
+        document.getElementById("date").valueAsDate = new Date(date);
+      });
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      function change_emplacement(tache,modal) {
+        var div_emplacement = ".div_emplacement";
+        var code_emplacement = "#code_emplacement";
+        var libelle_emplacement = "#libelle_emplacement";
+
+        if(tache != null && tache == "new" ){
+          $(div_emplacement).show();
+          $(code_emplacement).attr("required",true);
+          $(libelle_emplacement).attr("required",true);
+        }else{
+          $(div_emplacement).hide();
+          $(code_emplacement).removeAttr("required");
+          $(libelle_emplacement).removeAttr("required");
+        }
+
+      }
+      function change_service(tache,modal) {
+        var div_service= ".div_service";
+        var libelle_service = "#libelle_service";
+
+        if(tache != null && tache == "new" ){
+          $(div_service).show();
+          $(libelle_service).attr("required",true);
+        }else{
+          $(div_service).hide();
+          $(libelle_service).removeAttr("required");
+        }
+
+      }
+
+      $(document).on("change", "#emplacement_id", function() {
+        $('#equipement_id').empty();
+        $('#equipement_id').append($("<option value=\"\">Choisir un équipement</option>"));
+
+        if($("#emplacement_id").val()!=""){
+          $.ajax({
+            type : "GET",
+            url : "/jwork-gmao/maintenances/getEquipements/"+$("#emplacement_id").val(),
+            success : function(result) {
+              var equipements = result;
+              for(let i=0;i<equipements.length;i++){
+                $('#equipement_id').append($("<option></option>").attr("value",equipements[i].id).text(equipements[i].code));
+              }
+            },
+            error : function(result) {
+              console.log("error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+          });
+        }
+
+      });
+
+      /*]]>*/
+    </script>
+
+  </body>
+</html>
