@@ -17,9 +17,9 @@ Each sprint focused on delivering functional modules, such as equipment manageme
 Technologies Used
 The GMAO application was built using a robust tech stack to ensure efficiency, scalability, and cross-platform compatibility
 
-Backend: Spring Boot, providing a strong and flexible backend architecture.
-Frontend: Thymeleaf, integrated with Spring Boot to create dynamic web pages.
-Database: SQL Server, hosted in a Docker container for better deployment flexibility.
-IDE: IntelliJ was used to streamline the development process.
-Jira Integration: Jira API was employed for issue tracking, ensuring smooth collaboration and task management between team members.
+Backend: Spring Boot, providing a strong and flexible backend architecture.<br/>
+Frontend: Thymeleaf, integrated with Spring Boot to create dynamic web pages.<br/>
+Database: SQL Server, hosted in a Docker container for better deployment flexibility.<br/>
+IDE: IntelliJ was used to streamline the development process.<br/>
+Jira Integration: Jira API was employed for issue tracking, ensuring smooth collaboration and task management between team members.<br/>
 Docker containerization enabled easier deployment and version control, while the use of Spring Boot and Thymeleaf ensured smooth, responsive, and scalable web development.
