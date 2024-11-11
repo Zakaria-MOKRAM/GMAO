@@ -13,6 +13,7 @@
 
 ### Clone the repository
 To get started, clone the repository using the following command:<br>
+```bash
 git clone https://github.com/Zakaria-MOKRAM/GMAO.git<br>
 After cloning, move to the project directory:<br>
 cd GMAO<br>
