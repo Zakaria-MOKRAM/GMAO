@@ -12,11 +12,11 @@
 ## Installation
 
 ### Clone the repository
-To get started, clone the repository using the following command:<b>
-git clone https://github.com/Zakaria-MOKRAM/GMAO.git
-After cloning, move to the project directory:
-cd GMAO
-Install the required packages:
+To get started, clone the repository using the following command:<br>
+git clone https://github.com/Zakaria-MOKRAM/GMAO.git<br>
+After cloning, move to the project directory:<br>
+cd GMAO<br>
+Install the required packages:<br>
 mvn install
 If you're using Gradle, use this command instead:
 ./gradlew build
