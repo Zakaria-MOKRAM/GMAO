@@ -5,8 +5,8 @@
 
 ## Table of Contents
 - [Installation](#installation)
-- [Clone the repository](#Clone the repository)
-- [Access the application](#Access the application)
+- [Clone the repository](#Clone_the_repository)
+- [Access the application](#Access_the_application)
 
 ## Installation
 
