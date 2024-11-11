@@ -13,12 +13,19 @@
 
 ### Clone the repository
 To get started, clone the repository using the following command:
-
-```bash
 git clone https://github.com/Zakaria-MOKRAM/GMAO.git
-Backend: Spring Boot, providing a strong and flexible backend architecture.<br/>
-Frontend: Thymeleaf, integrated with Spring Boot to create dynamic web pages.<br/>
-Database: SQL Server, hosted in a Docker container for better deployment flexibility.<br/>
-IDE: IntelliJ was used to streamline the development process.<br/>
-Jira Integration: Jira API was employed for issue tracking, ensuring smooth collaboration and task management between team members.<br/>
-Docker containerization enabled easier deployment and version control, while the use of Spring Boot and Thymeleaf ensured smooth, responsive, and scalable web development.
+After cloning, move to the project directory:
+cd GMAO
+Install the required packages:
+mvn install
+If you're using Gradle, use this command instead:
+./gradlew build
+This will download and install the required dependencies for the Spring Boot project.
+Start the Spring Boot server:
+mvn spring-boot:run
+If you're using Gradle, run this command instead:
+./gradlew bootRun
+The application will now be running, and the backend will serve the Thymeleaf views directly.
+### Access the application
+Once the server is running, open your browser and navigate to http://localhost:8080 to access the application. Since the frontend is integrated with Thymeleaf, the server will render HTML pages directly.
+
