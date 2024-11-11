@@ -5,9 +5,8 @@
 
 ## Table of Contents
 - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+- [Clone the repository](#Clone the repository)
+- [Access the application](#Access the application)
 
 ## Installation
 
