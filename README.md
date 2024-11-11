@@ -13,7 +13,7 @@
 ### Clone the repository
 To get started, clone the repository using the following command:
 ```bash
-git clone https://github.com/Zakaria-MOKRAM/GMAO.git <br>
+git clone https://github.com/Zakaria-MOKRAM/GMAO.git 
 ```
 After cloning, move to the project directory:<br>
 ```bash
